@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f7f7fb">
+    <meta name="description" content="Create an organic, audience-first YouTube video growth plan with AI.">
+    <title>YouTube Growth Agent</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="YouTube Growth Agent home">
+        <span class="brand-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M21.6 7.2a2.9 2.9 0 0 0-2-2C17.8 4.7 12 4.7 12 4.7s-5.8 0-7.6.5a2.9 2.9 0 0 0-2 2A30 30 0 0 0 2 12a30 30 0 0 0 .4 4.8 2.9 2.9 0 0 0 2 2c1.8.5 7.6.5 7.6.5s5.8 0 7.6-.5a2.9 2.9 0 0 0 2-2A30 30 0 0 0 22 12a30 30 0 0 0-.4-4.8Z" fill="currentColor"/><path d="m10 15.5 5.2-3.5L10 8.5v7Z" fill="white"/></svg>
+        </span>
+        <span class="brand-name">channel<span>craft</span></span>
+      </a>
+      <div class="topbar-right"><span class="status-dot"></span><span>YOUR CREATOR WORKSPACE</span></div>
+    </header>
+
+    <main class="layout">
+      <section class="intro" aria-labelledby="page-title">
+        <div class="eyebrow"><span class="sparkle" aria-hidden="true">✳</span> YOUR YOUTUBE GROWTH PARTNER</div>
+        <h1 id="page-title">Make your next video<br><span>the one they find.</span></h1>
+        <p class="intro-copy">Plan audience-first videos, polish their metadata, set a steady publishing rhythm, and turn your own analytics into practical next steps.</p>
+        <div class="promise"><span aria-hidden="true">✦</span> Built for real viewers, not vanity metrics.</div>
+
+        <div class="mini-note">
+          <span class="mini-note-icon" aria-hidden="true">↗</span>
+          <div><strong>Better videos start with better questions.</strong><p>Tell us who you make videos for. We’ll help with the next idea.</p></div>
+        </div>
+      </section>
+
+      <section class="workspace" aria-label="Video plan generator">
+        <div class="form-card">
+          <div class="card-heading">
+            <div><span class="step-label">LET’S GET TO KNOW YOUR CHANNEL</span><h2>Build your video plan</h2></div>
+            <span class="heading-icon" aria-hidden="true">✳</span>
+          </div>
+
+          <form id="growth-form">
+            <label class="field-label" for="niche">What’s your channel about?<span class="required">*</span></label>
+            <input id="niche" name="niche" maxlength="120" placeholder="e.g. simple home cooking for busy people" required>
+            <p class="field-hint">A specific niche helps us find a more relevant angle.</p>
+
+            <label class="field-label audience-label" for="audience">Who do you want to reach?<span class="required">*</span></label>
+            <input id="audience" name="audience" maxlength="120" placeholder="e.g. beginners who want quick weeknight meals" required>
+
+            <div class="field-grid">
+              <div>
+                <label class="field-label" for="stage">Channel stage</label>
+                <select id="stage" name="stage">
+                  <option value="starting">Just getting started</option>
+                  <option value="growing">Finding my rhythm</option>
+                  <option value="established">Established channel</option>
+                </select>
+              </div>
+              <div>
+                <label class="field-label" for="format">Video format</label>
+                <select id="format" name="format">
+                  <option value="any">Recommend a format</option>
+                  <option value="long-form">Long-form</option>
+                  <option value="shorts">Shorts</option>
+                  <option value="both">Long-form + Shorts</option>
+                </select>
+              </div>
+            </div>
+
+            <fieldset class="goal-field">
+              <legend class="field-label">What matters most right now?</legend>
+              <div class="goal-options">
+                <label class="goal-option"><input type="radio" name="goal" value="views" checked><span>More views</span></label>
+                <label class="goal-option"><input type="radio" name="goal" value="subscribers"><span>More subscribers</span></label>
+                <label class="goal-option"><input type="radio" name="goal" value="both"><span>Both</span></label>
+              </div>
+            </fieldset>
+
+            <button class="submit-button" type="submit">
+              <span class="button-label">Build my video plan</span><span class="button-arrow" aria-hidden="true">→</span>
+            </button>
+            <p class="privacy-note"><span aria-hidden="true">⌑</span> Your channel details aren’t saved by this app.</p>
+            <p class="form-error" id="form-error" role="alert" hidden></p>
+          </form>
+        </div>
+      </section>
+
+      <section class="results" id="results" aria-live="polite" aria-busy="false" hidden>
+        <div class="results-heading">
+          <div><span class="step-label" id="plan-source">YOUR NEXT UPLOAD, FIGURED OUT</span><h2>Here’s your game plan<span class="heading-period">.</span></h2></div>
+          <div class="result-actions">
+            <button class="copy-button" id="next-idea" type="button" hidden>Another idea <span aria-hidden="true">↻</span></button>
+            <button class="copy-button" id="copy-plan" type="button">Copy plan <span aria-hidden="true">↗</span></button>
+          </div>
+        </div>
+        <div class="result-grid" id="result-grid"></div>
+        <p class="form-error" id="next-idea-error" role="alert" hidden></p>
+        <p class="results-disclaimer">Use these suggestions as a starting point. Tailor them to your voice, check factual claims, and let your audience’s response guide what you make next.</p>
+      </section>
+
+      <section class="creator-tools" aria-labelledby="creator-tools-title">
+        <div class="tools-heading">
+          <span class="step-label">BUILD A STEADY CREATOR WORKFLOW</span>
+          <h2 id="creator-tools-title">Plan your rhythm and learn from results<span class="heading-period">.</span></h2>
+          <p>These tools make suggestions only. They do not connect to your YouTube account, publish videos, or automate engagement.</p>
+        </div>
+        <div class="tools-grid">
+          <section class="form-card tool-card" aria-labelledby="schedule-title">
+            <div class="card-heading">
+              <div><span class="step-label">PUBLISHING</span><h2 id="schedule-title">Create a repeating rhythm</h2></div>
+              <span class="heading-icon" aria-hidden="true">↗</span>
+            </div>
+            <form id="schedule-form">
+              <div class="field-grid">
+                <div>
+                  <label class="field-label" for="posts-per-week">Uploads per week</label>
+                  <select id="posts-per-week" name="postsPerWeek">
+                    <option value="1">1 upload</option>
+                    <option value="2">2 uploads</option>
+                    <option value="3">3 uploads</option>
+                    <option value="4">4 uploads</option>
+                    <option value="5">5 uploads</option>
+                    <option value="6">6 uploads</option>
+                    <option value="7">7 uploads</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="field-label" for="start-day">First publishing day</label>
+                  <select id="start-day" name="startDay">
+                    <option>Monday</option>
+                    <option>Tuesday</option>
+                    <option>Wednesday</option>
+                    <option>Thursday</option>
+                    <option>Friday</option>
+                    <option>Saturday</option>
+                    <option>Sunday</option>
+                  </select>
+                </div>
+              </div>
+              <label class="field-label tool-field-label" for="schedule-format">Content format</label>
+              <select id="schedule-format" name="format">
+                <option value="long-form">Long-form videos</option>
+                <option value="shorts">Shorts</option>
+                <option value="both">Alternate long-form and Shorts</option>
+              </select>
+              <button class="submit-button tool-submit" type="submit">Suggest my schedule <span class="button-arrow" aria-hidden="true">→</span></button>
+              <p class="form-error" id="schedule-error" role="alert" hidden></p>
+            </form>
+            <div class="tool-output" id="schedule-output" aria-live="polite" hidden></div>
+            <div class="reminder-settings">
+              <h3>Optional weekly reminder</h3>
+              <p>Reminds you to work on your next upload. It does not publish anything.</p>
+              <div class="field-grid">
+                <div>
+                  <label class="field-label" for="reminder-day">Reminder day</label>
+                  <select id="reminder-day">
+                    <option value="1">Monday</option>
+                    <option value="2">Tuesday</option>
+                    <option value="3">Wednesday</option>
+                    <option value="4">Thursday</option>
+                    <option value="5">Friday</option>
+                    <option value="6">Saturday</option>
+                    <option value="0">Sunday</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="field-label" for="reminder-time">Reminder time</label>
+                  <input id="reminder-time" type="time" value="10:00">
+                </div>
+              </div>
+              <button class="copy-button reminder-button" id="save-reminder" type="button">Save reminder</button>
+              <button class="copy-button reminder-button" id="clear-reminder" type="button">Turn off</button>
+              <p class="reminder-status" id="reminder-status" role="status">Reminders are off. While active, this page must be open for a reminder to appear.</p>
+            </div>
+          </section>
+
+          <section class="form-card tool-card" aria-labelledby="analytics-title">
+            <div class="card-heading">
+              <div><span class="step-label">ANALYTICS</span><h2 id="analytics-title">Review a video’s signals</h2></div>
+              <span class="heading-icon" aria-hidden="true">⌁</span>
+            </div>
+            <form id="analytics-form">
+              <div class="field-grid">
+                <div>
+                  <label class="field-label" for="metric-views">Views</label>
+                  <input id="metric-views" name="views" type="number" min="0" max="1000000000" step="1" value="1000" required>
+                </div>
+                <div>
+                  <label class="field-label" for="metric-impressions">Impressions</label>
+                  <input id="metric-impressions" name="impressions" type="number" min="0" max="1000000000" step="1" value="10000" required>
+                </div>
+                <div>
+                  <label class="field-label" for="metric-ctr">Click-through rate (%)</label>
+                  <input id="metric-ctr" name="clickThroughRate" type="number" min="0" max="100" step="0.1" value="4" required>
+                </div>
+                <div>
+                  <label class="field-label" for="metric-subscribers">Subscribers gained</label>
+                  <input id="metric-subscribers" name="subscribersGained" type="number" min="0" max="1000000000" step="1" value="10" required>
+                </div>
+                <div>
+                  <label class="field-label" for="metric-average-duration">Average view duration (min)</label>
+                  <input id="metric-average-duration" name="averageViewDurationMinutes" type="number" min="0" max="600" step="0.1" value="3" required>
+                </div>
+                <div>
+                  <label class="field-label" for="metric-video-length">Video length (min)</label>
+                  <input id="metric-video-length" name="videoLengthMinutes" type="number" min="0.1" max="600" step="0.1" value="8" required>
+                </div>
+              </div>
+              <p class="field-hint tool-hint">Enter figures from one video in YouTube Analytics. Nothing is saved or fetched from your account.</p>
+              <button class="submit-button tool-submit" type="submit">Review these metrics <span class="button-arrow" aria-hidden="true">→</span></button>
+              <p class="form-error" id="analytics-error" role="alert" hidden></p>
+            </form>
+            <div class="tool-output" id="analytics-output" aria-live="polite" hidden></div>
+          </section>
+        </div>
+      </section>
+    </main>
+    <footer><span>CHANNELCRAFT</span><span>Grow by making something worth watching.</span></footer>
+  </body>
+</html>
