@@ -12,6 +12,13 @@ let latestPlan = null;
 let latestBrief = null;
 let ideaNumber = 0;
 
+document.querySelector("#channel-quick-start").addEventListener("click", () => {
+  form.elements.stage.value = "growing";
+  form.elements.format.value = "both";
+  form.elements.goal.value = "views";
+  form.requestSubmit();
+});
+
 function addTextCard(title, content, wide = false) {
   const card = document.createElement("article");
   card.className = `result-card${wide ? " wide" : ""}`;
