@@ -1,6 +1,6 @@
-# YouTube Growth Agent
+# Aayush Creator Lab
 
-A small web app for planning organic YouTube growth. It suggests video ideas and outlines, title and description options, search phrases, a four-week repeating publishing rhythm, and practical observations from analytics figures you enter. You can request more ideas on demand and optionally set a weekly browser reminder. It always works without an API key using its built-in planner. Optionally, configure Google Gemini for AI-generated video-plan suggestions.
+A small creator studio configured for Aayush Engineering Hub. It suggests engineering video ideas and outlines, title and description options, search phrases, a four-week repeating publishing rhythm, and practical observations from analytics figures you enter. The channel brief is prefilled and the one-click starter builds a plan for engineering students and curious beginners. You can request more ideas on demand and optionally set a weekly browser reminder. It always works without an API key using its built-in planner. Optionally, configure Google Gemini for AI-generated video-plan suggestions.
 
 The agent focuses on sustainable discovery and audience value. It does not buy views, automate engagement, publish to your channel, connect to YouTube Analytics, or promise a specific number of views or subscribers. Publishing and analytics suggestions are generated from the preferences and figures you provide and are not saved. Weekly reminder settings are stored in your browser only. A reminder requires notification permission and the app page to remain open; it is not a background service.
 
@@ -16,7 +16,7 @@ Start the server:
 npm start
 ```
 
-Open <http://localhost:3000> and submit the form. Suggestions are generated on the server, and channel details and analytics figures are not saved.
+Open <http://localhost:3000> and select **Build my first engineering video plan** or edit the prefilled channel brief and submit the form. Use **Open channel** to visit Aayush Engineering Hub on YouTube. Suggestions are generated on the server, and channel details and analytics figures are not saved.
 
 ### Optional: enable Gemini
 

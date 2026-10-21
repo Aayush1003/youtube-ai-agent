@@ -41,6 +41,9 @@ button, input, select { font: inherit; }
 .brand-icon svg { width: 30px; height: 30px; }
 .brand-name { font-family: "Manrope", sans-serif; font-size: 18px; font-weight: 800; letter-spacing: -.8px; }
 .brand-name span { color: var(--purple); }
+.channel-link { display: flex; align-items: center; gap: 9px; color: #77768a; text-decoration: none; font-size: 10px; font-weight: 700; letter-spacing: .8px; }
+.channel-link:hover { color: var(--purple-dark); }
+.channel-link > span:last-child { font-size: 14px; }
 .topbar-right { display: flex; align-items: center; gap: 9px; color: #85849a; font-size: 10px; font-weight: 700; letter-spacing: 1.05px; }
 .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #7cc5a0; box-shadow: 0 0 0 3px #e8f5ed; }
 
@@ -61,6 +64,11 @@ h1 span { color: var(--purple); }
 .mini-note-icon { display: grid; place-items: center; flex: 0 0 31px; height: 31px; border-radius: 9px; color: var(--purple); background: #f0ecff; font-size: 17px; font-weight: 700; }
 .mini-note strong { font-size: 11px; }
 .mini-note p { margin: 3px 0 0; color: var(--muted); font-size: 10px; line-height: 1.5; }
+.quick-start { display: inline-flex; align-items: center; gap: 12px; margin-top: 18px; padding: 12px 15px; border: 0; border-radius: 9px; color: #fff; background: linear-gradient(105deg, #7156e8, #8064ed); box-shadow: 0 5px 12px rgba(112,85,232,.2); font-size: 11px; font-weight: 700; cursor: pointer; transition: transform .15s, box-shadow .15s; }
+.quick-start:hover { transform: translateY(-1px); box-shadow: 0 8px 17px rgba(112,85,232,.27); }
+.quick-start:focus-visible { outline: 3px solid rgba(112,85,232,.35); outline-offset: 3px; }
+.quick-start span { font-size: 16px; }
+.quick-start-note { margin: 8px 0 0; color: #9998a9; font-size: 10px; }
 
 .workspace { max-width: 710px; }
 .form-card { padding: 30px 32px 22px; border: 1px solid rgba(228, 227, 237, .9); border-radius: 18px; background: var(--paper); box-shadow: 0 14px 40px rgba(47, 40, 88, .07); }
@@ -149,12 +157,14 @@ footer span:first-child { font-weight: 700; letter-spacing: 1px; }
 
 @media (max-width: 600px) {
   .topbar { height: 65px; padding: 0 20px; }
-  .topbar-right { font-size: 8px; letter-spacing: .65px; }
+  .channel-link { gap: 6px; font-size: 8px; letter-spacing: .3px; }
+  .channel-link .status-dot { width: 6px; height: 6px; }
   .layout { width: calc(100% - 36px); padding: 47px 0 40px; }
   .intro { margin-bottom: 25px; }
   h1 { font-size: 38px; letter-spacing: -1.8px; }
   .intro-copy { font-size: 13px; }
   .mini-note { margin-top: 17px; }
+  .quick-start { max-width: 100%; font-size: 10px; }
   .form-card { padding: 23px 19px 19px; border-radius: 14px; }
   .card-heading h2 { font-size: 20px; }
   .field-grid { gap: 10px; }
