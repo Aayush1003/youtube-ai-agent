@@ -39,5 +39,6 @@ To use another port, set `PORT` before starting the server.
 4. Select **Another idea** to request a fresh angle for the same channel brief whenever you need one.
 5. Use **Create a repeating rhythm** to see four weeks of your selected upload pattern. Optionally set a weekly reminder to work on your next upload.
 6. Enter figures for one video under **Review a video’s signals** to get directional prompts about click-through rate, retention, and subscriber conversion.
+7. Use **Your first animated DSA Short** to preview a vertical Two Sum explainer, copy its voiceover, or export a silent 25-second WebM video from a supported browser. Add your own narration and review the example before uploading; the app never publishes to your channel.
 
 The built-in planner uses reusable templates; Gemini can provide more tailored video-plan ideas when configured. Analytics observations use only the values entered and should be compared with your own channel baseline. No tool can guarantee views or subscribers.

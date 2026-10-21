@@ -135,6 +135,25 @@ select { cursor: pointer; }
 .reminder-button { margin: 12px 6px 0 0; }
 .reminder-status { margin: 10px 0 0; color: #77768a; font-size: 10px; line-height: 1.5; }
 
+.short-studio { grid-column: 1 / -1; margin-top: 54px; }
+.short-studio-card { display: grid; grid-template-columns: minmax(220px, 330px) minmax(0, 1fr); gap: 35px; align-items: center; max-width: 850px; padding: 25px; border: 1px solid rgba(228,227,237,.9); border-radius: 18px; background: #fff; box-shadow: 0 14px 40px rgba(47,40,88,.07); }
+.short-preview { position: relative; overflow: hidden; width: 100%; border-radius: 13px; background: #101a38; box-shadow: 0 9px 25px rgba(22,20,53,.18); }
+.short-preview canvas { display: block; width: 100%; height: auto; }
+.short-preview-badge { position: absolute; top: 12px; left: 12px; display: flex; align-items: center; gap: 8px; padding: 8px 10px; border: 1px solid rgba(255,255,255,.2); border-radius: 20px; color: #fff; background: rgba(16,20,45,.65); font-size: 9px; font-weight: 700; letter-spacing: .7px; backdrop-filter: blur(8px); }
+.short-preview-badge .status-dot { width: 6px; height: 6px; }
+.short-details h3 { margin: 9px 0 9px; font-family: "Manrope", sans-serif; font-size: 23px; letter-spacing: -.7px; }
+.short-details > p { color: #77768a; font-size: 12px; line-height: 1.7; }
+.short-actions { display: flex; flex-wrap: wrap; gap: 9px; margin: 19px 0 10px; }
+.short-actions button { min-height: 40px; }
+.short-export { width: auto; padding: 0 14px; font-size: 11px; }
+.short-status { min-height: 34px; margin: 8px 0 16px; color: #666579; font-size: 10px; line-height: 1.6; }
+.voiceover { padding: 15px; border: 1px solid #e8e6f0; border-radius: 11px; background: #faf9ff; }
+.voiceover-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 9px; }
+.voiceover-heading h4 { margin: 0; color: #5f4acb; font-size: 11px; }
+.voiceover-heading .copy-button { padding: 7px 9px; font-size: 10px; }
+.voiceover > p { margin: 0; color: #666579; font-size: 11px; line-height: 1.75; }
+.short-details .short-note { margin: 11px 0 0; color: #9291a0; font-size: 10px; line-height: 1.6; }
+
 footer { display: flex; justify-content: space-between; gap: 15px; padding: 20px max(6.2vw, 28px); border-top: 1px solid #e9e8f0; color: #9695a6; font-size: 10px; }
 footer span:first-child { font-weight: 700; letter-spacing: 1px; }
 
@@ -171,6 +190,10 @@ footer span:first-child { font-weight: 700; letter-spacing: 1px; }
   .tools-heading h2 { font-size: 21px; }
   .tools-grid { grid-template-columns: 1fr; gap: 12px; }
   .tool-card { padding: 23px 19px 19px; }
+  .short-studio { margin-top: 40px; }
+  .short-studio-card { grid-template-columns: 1fr; gap: 20px; padding: 17px; }
+  .short-preview { width: min(100%, 310px); margin: 0 auto; }
+  .short-details h3 { font-size: 20px; }
   footer { padding: 17px 20px; font-size: 9px; }
 }
 
