@@ -4,8 +4,17 @@
   "private": true,
   "description": "An AI assistant for planning organic YouTube channel growth.",
   "scripts": {
-    "start": "node server.js",
+    "build": "esbuild src/short-studio.jsx src/anime-studio.jsx src/daily-video-studio.jsx --bundle --minify --format=iife --target=es2020 --outdir=. --outbase=src --entry-names=[name].bundle",
+    "start": "npm run build && node server.js",
     "test": "node --test"
+  },
+  "dependencies": {
+    "framer-motion": "^12.23.24",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.11"
   },
   "engines": {
     "node": ">=18"
