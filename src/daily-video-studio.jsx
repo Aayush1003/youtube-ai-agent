@@ -115,6 +115,33 @@ function drawFrame(canvas, video, time) {
       context.stroke();
     }
     context.globalAlpha = 1;
+  } else if (video.category === "food") {
+    const centerX = width * 0.5;
+    const centerY = height * 0.53;
+    const radius = minDimension * 0.17;
+    context.fillStyle = "rgba(255,244,222,.92)";
+    context.beginPath();
+    context.arc(centerX, centerY, radius, 0, Math.PI * 2);
+    context.fill();
+    context.strokeStyle = `${accent}cc`;
+    context.lineWidth = Math.max(3, minDimension * 0.007);
+    context.beginPath();
+    context.arc(centerX, centerY, radius * 0.87, 0, Math.PI * 2);
+    context.stroke();
+    const ingredients = [
+      [0, -0.37, 0.07, "#e67c54"],
+      [-0.38, -0.07, 0.055, "#78a66d"],
+      [0.35, -0.13, 0.06, "#f1bd58"],
+      [-0.2, 0.31, 0.055, "#c65f58"],
+      [0.27, 0.31, 0.05, "#6e9c63"],
+      [0.03, -0.04, 0.055, "#f4d681"],
+    ];
+    ingredients.forEach(([x, y, size, color]) => {
+      context.fillStyle = color;
+      context.beginPath();
+      context.arc(centerX + x * radius, centerY + y * radius, size * minDimension, 0, Math.PI * 2);
+      context.fill();
+    });
   } else {
     for (let index = 0; index < 26; index += 1) {
       const x = ((index * 137 + 41) % 997) / 997 * width;
@@ -228,6 +255,7 @@ function readProgress() {
 function DailyVideoStudio() {
   const canvasRef = useRef(null);
   const audioRef = useRef(null);
+  const voiceInputRef = useRef(null);
   const frameRef = useRef(null);
   const recorderRef = useRef(null);
   const audioContextRef = useRef(null);
@@ -267,9 +295,12 @@ function DailyVideoStudio() {
   });
   const [progress, setProgress] = useState(readProgress);
   const [video, setVideo] = useState(null);
+  const [storyDraft, setStoryDraft] = useState(null);
+  const [voiceSource, setVoiceSource] = useState("ai");
+  const [voiceFile, setVoiceFile] = useState(null);
   const [time, setTime] = useState(0);
   const [mode, setMode] = useState("idle");
-  const [status, setStatus] = useState("One prompt creates your script, AI narration, animated video, and download.");
+  const [status, setStatus] = useState("One prompt creates your script, AI or personal narration, animated video, and download.");
   const [error, setError] = useState("");
 
   const category = CATEGORY_BY_ID[categoryId];
@@ -322,6 +353,9 @@ function DailyVideoStudio() {
     if (nextCategory === categoryId || busy) return;
     setCategoryId(nextCategory);
     setVideo(null);
+    setStoryDraft(null);
+    setVoiceFile(null);
+    if (voiceInputRef.current) voiceInputRef.current.value = "";
     clearAudio();
     setTime(0);
     setError("");
@@ -329,16 +363,15 @@ function DailyVideoStudio() {
     saveSetting("channelcraft.daily-video-category", nextCategory, "Video category");
   }
 
-  function prepareVideo(generatedVideo, audioData, mimeType) {
-    const bytes = Uint8Array.from(atob(audioData), (character) => character.charCodeAt(0));
-    const audioUrl = URL.createObjectURL(new Blob([bytes], { type: mimeType || "audio/wav" }));
+  function prepareVideo(generatedVideo, audioBlob, voiceLabel) {
+    const audioUrl = URL.createObjectURL(audioBlob);
     const audio = new Audio();
     audio.preload = "auto";
     audioRef.current = audio;
     audio.addEventListener("error", () => {
       URL.revokeObjectURL(audioUrl);
       audioRef.current = null;
-      setError("The generated narration could not be decoded. Try a current Chrome or Edge browser.");
+      setError("The narration could not be decoded. Try a current Chrome or Edge browser.");
       setMode("idle");
     }, { once: true });
     audio.addEventListener("loadedmetadata", () => {
@@ -364,12 +397,46 @@ function DailyVideoStudio() {
         canvasRef.current.height = format === "long" ? 1080 : 1920;
       }
       setVideo(readyVideo);
+      setStoryDraft(null);
       setTime(0);
       setMode("ready");
       setError("");
-      setStatus(`Your ${category.label.toLowerCase()} video is ready with AI narration (${formatDuration(audio.duration)}). Preview it or download the WebM.`);
+      setStatus(`Your ${category.label.toLowerCase()} video is ready with ${voiceLabel} (${formatDuration(audio.duration)}). Preview it or download the WebM.`);
     }, { once: true });
     audio.src = audioUrl;
+  }
+
+  function attachUploadedVoice(story, file) {
+    clearAudio();
+    setVideo(null);
+    setStoryDraft(story);
+    setMode("generating");
+    setStatus("Loading your voice locally and building the video…");
+    prepareVideo(story, file, "your voice");
+  }
+
+  function selectVoiceFile(event) {
+    const file = event.target.files?.[0] || null;
+    if (!file) return;
+    if (!file.type.startsWith("audio/")) {
+      setVoiceFile(null);
+      setError("Choose an audio file such as MP3, WAV, M4A, or WebM audio.");
+      event.target.value = "";
+      return;
+    }
+    if (file.size > 100 * 1024 * 1024) {
+      setVoiceFile(null);
+      setError("Audio files must be 100 MB or smaller.");
+      event.target.value = "";
+      return;
+    }
+    setVoiceFile(file);
+    setError("");
+    if (storyDraft) {
+      attachUploadedVoice(storyDraft, file);
+    } else {
+      setStatus(`${file.name} is ready. It stays on this device and will be added to your video locally.`);
+    }
   }
 
   async function generateVideo(event) {
@@ -377,24 +444,49 @@ function DailyVideoStudio() {
     if (!prompt.trim() || busy) return;
     clearAudio();
     setVideo(null);
+    setStoryDraft(null);
     setError("");
     setMode("generating");
-    setStatus(research
-      ? "Researching current sources, writing your video, and generating AI narration…"
-      : "Writing your video and generating AI narration…");
+    setStatus(voiceSource === "ai"
+      ? research
+        ? "Researching current sources, writing your video, and generating AI narration…"
+        : "Writing your video and generating AI narration…"
+      : research
+        ? "Researching current sources and writing your video script…"
+        : "Writing your video script…");
     try {
       const response = await fetch("/api/daily-video", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: prompt.trim(), category: categoryId, format, research }),
+        body: JSON.stringify({ prompt: prompt.trim(), category: categoryId, format, research, voiceSource }),
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || `The request failed (HTTP ${response.status}).`);
-      if (typeof result.audioBase64 !== "string" || !result.audioBase64) {
+      const { audioBase64, ...generatedVideo } = result;
+      if (voiceSource === "upload") {
+        setStoryDraft(generatedVideo);
+        if (voiceFile) {
+          attachUploadedVoice(generatedVideo, voiceFile);
+        } else {
+          setMode("ready");
+          setStatus("Your script and storyboard are ready. Upload your voice above to preview and download the narrated video.");
+        }
+        try {
+          localStorage.setItem(PROMPT_KEY, prompt);
+        } catch (storageError) {
+          console.error("Could not save the video prompt:", storageError);
+        }
+        return;
+      }
+      if (typeof audioBase64 !== "string" || !audioBase64) {
         throw new Error("The video was generated without narration audio. Please try again.");
       }
-      const { audioBase64, ...generatedVideo } = result;
-      prepareVideo(generatedVideo, audioBase64, result.audioMimeType);
+      const audioBytes = Uint8Array.from(atob(audioBase64), (character) => character.charCodeAt(0));
+      prepareVideo(
+        generatedVideo,
+        new Blob([audioBytes], { type: result.audioMimeType || "audio/wav" }),
+        "AI narration"
+      );
       try {
         localStorage.setItem(PROMPT_KEY, prompt);
       } catch (storageError) {
@@ -551,9 +643,10 @@ function DailyVideoStudio() {
   }
 
   async function copyScript() {
-    if (!video) return;
+    const currentScript = video || storyDraft;
+    if (!currentScript) return;
     try {
-      await navigator.clipboard.writeText(video.voiceover);
+      await navigator.clipboard.writeText(currentScript.voiceover);
       setStatus("The narration script was copied to your clipboard.");
     } catch (copyError) {
       setStatus(`Could not copy the script: ${copyError.message}`);
@@ -573,9 +666,9 @@ function DailyVideoStudio() {
       <main className="daily-shell">
         <section className="daily-hero">
           <div>
-            <div className="daily-eyebrow">FIVE CATEGORIES · ONE SIMPLE WORKFLOW</div>
+            <div className="daily-eyebrow">SIX CATEGORIES · ONE SIMPLE WORKFLOW</div>
             <h1>One prompt.<br /><span>Your next video.</span></h1>
-            <p className="daily-hero-copy">Pick a channel category, type what you want to make, and let AI research sources, write the script, narrate it, and build a video you can download. No editing timeline or extra idea-selection steps.</p>
+            <p className="daily-hero-copy">Pick a channel category, type what you want to make, and let AI research sources, write the script, and build a video with an AI narrator or your own voice. No editing timeline or extra idea-selection steps.</p>
           </div>
           <div className="daily-streak-card" aria-label={`${progress.streak} day video streak`}>
             <strong>{progress.streak} day{progress.streak === 1 ? "" : "s"} ✦</strong>
@@ -617,7 +710,7 @@ function DailyVideoStudio() {
               <div>
                 <span className="daily-step">02 · TYPE ONE PROMPT</span>
                 <h2 id="daily-prompt-title">Tell us what to make</h2>
-                <p>One clear sentence is enough. AI writes and narrates the finished video.</p>
+                <p>One clear sentence is enough. AI writes the video; choose who narrates it.</p>
               </div>
               <button className="daily-sample-button" type="button" onClick={() => {
                 setPrompt(category.prompt);
@@ -649,6 +742,7 @@ function DailyVideoStudio() {
                   onChange={(event) => {
                     setFormat(event.target.value);
                     setVideo(null);
+                    setStoryDraft(null);
                     clearAudio();
                     setTime(0);
                     saveSetting(FORMAT_KEY, event.target.value, "Video format");
@@ -658,6 +752,41 @@ function DailyVideoStudio() {
                   <option value="short">Short · ~60 sec · vertical 9:16</option>
                   <option value="long">Long · ~5 min · landscape 16:9</option>
                 </select>
+                <label className="daily-prompt-label" htmlFor="daily-video-voice">Narration</label>
+                <select
+                  className="daily-format-select"
+                  id="daily-video-voice"
+                  value={voiceSource}
+                  onChange={(event) => {
+                    setVoiceSource(event.target.value);
+                    setVideo(null);
+                    setStoryDraft(null);
+                    clearAudio();
+                    setTime(0);
+                    setError("");
+                    setMode("idle");
+                    setStatus(event.target.value === "ai"
+                      ? "AI narration selected. Generate a video to hear its voiceover."
+                      : "Your voice selected. Upload a recording or generate a script first.");
+                  }}
+                  disabled={busy}
+                >
+                  <option value="ai">AI voice · warm narrator</option>
+                  <option value="upload">My voice · upload recording</option>
+                </select>
+                {voiceSource === "upload" && (
+                  <label className="daily-upload-field">
+                    <span>Your voice recording <small>(audio stays on this device)</small></span>
+                    <input
+                      ref={voiceInputRef}
+                      type="file"
+                      accept="audio/*"
+                      onChange={selectVoiceFile}
+                      disabled={busy}
+                    />
+                    {voiceFile && <small className="daily-upload-name">Selected: {voiceFile.name}</small>}
+                  </label>
+                )}
                 <label className="daily-research-toggle">
                   <input
                     type="checkbox"
@@ -693,7 +822,7 @@ function DailyVideoStudio() {
             </div>
             <ul className="daily-includes-list">
               <li><span>✦</span><span>A category-specific script and scene-by-scene storyboard</span></li>
-              <li><span>✦</span><span>Warm AI narration synced into the finished video</span></li>
+              <li><span>✦</span><span>Your choice of warm AI narration or your own locally uploaded voice</span></li>
               <li><span>✦</span><span>Original animated graphics in a vertical or landscape layout</span></li>
               <li><span>✦</span><span>Optional live web research, with citations beside the video</span></li>
               <li><span>✦</span><span>One-click local WebM download—nothing auto-publishes</span></li>
@@ -701,6 +830,41 @@ function DailyVideoStudio() {
             <p className="daily-process-note">The finished video uses animated graphics rather than generated gameplay or film footage. Review generated facts and rights before publishing. Your prompt and selected research request are sent to Gemini; your video is rendered and downloaded in this browser.</p>
           </aside>
         </div>
+
+        {storyDraft && !video && (
+          <section className="daily-output" aria-labelledby="daily-draft-title">
+            <div className="daily-output-header">
+              <div>
+                <span className="daily-step">{category.label.toUpperCase()} · SCRIPT READY</span>
+                <h2 id="daily-draft-title">{storyDraft.title}</h2>
+                <p>{storyDraft.logline}</p>
+              </div>
+              <button className="daily-copy-button" type="button" onClick={copyScript} disabled={busy}>Copy script</button>
+            </div>
+            <div className="daily-script-column">
+              <h3>Your narration script</h3>
+              <div className="daily-script-text">{storyDraft.voiceover}</div>
+              <div className="daily-scenes" aria-label="Video storyboard">
+                {storyDraft.scenes.map((scene, index) => (
+                  <div className="daily-scene" key={`${scene.title}-${index}`}>
+                    <strong>{String(index + 1).padStart(2, "0")} · {scene.title}</strong>
+                    <span>{scene.caption}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            {storyDraft.sources?.length > 0 && (
+              <div className="daily-sources" aria-label="Research sources">
+                {storyDraft.sources.map((source) => (
+                  <a className="daily-source-link" href={source.url} key={source.url} target="_blank" rel="noreferrer">
+                    Source: {source.title} ↗
+                  </a>
+                ))}
+              </div>
+            )}
+            <p className="daily-footnote">Upload your recording in the form above to sync it with the animated scenes. Your recording is not sent to the server.</p>
+          </section>
+        )}
 
         {video && (
           <section className="daily-output" aria-labelledby="daily-output-title">

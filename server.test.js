@@ -124,14 +124,17 @@ test("validates anime inspiration and video requests", () => {
 
 test("validates daily video prompts, categories, and research choice", () => {
   const validInput = { prompt: "Explain a clever game strategy", category: "gaming", format: "short", research: true };
-  assert.equal(DAILY_VIDEO_CATEGORIES.length, 5);
+  assert.equal(DAILY_VIDEO_CATEGORIES.length, 6);
+  assert.ok(DAILY_VIDEO_CATEGORIES.some((category) => category.id === "food"));
   assert.equal(validateDailyVideoInput(validInput), null);
   assert.equal(validateDailyVideoInput({ ...validInput, category: "education", format: "long", research: false }), null);
   assert.match(validateDailyVideoInput({ ...validInput, prompt: " " }), /prompt/);
   assert.match(validateDailyVideoInput({ ...validInput, prompt: "x".repeat(501) }), /prompt/);
   assert.match(validateDailyVideoInput({ ...validInput, category: "sports" }), /Choose gaming/);
+  assert.equal(validateDailyVideoInput({ ...validInput, category: "food" }), null);
   assert.match(validateDailyVideoInput({ ...validInput, format: "medium" }), /format/);
   assert.match(validateDailyVideoInput({ ...validInput, research: "yes" }), /research/);
+  assert.match(validateDailyVideoInput({ ...validInput, voiceSource: "robot" }), /narration/);
   assert.match(validateDailyVideoInput(null), /JSON object/);
   assert.equal(calculateDailyStreak(["2025-04-11", "2025-04-12"], "2025-04-12"), 2);
 });
@@ -240,6 +243,44 @@ test("generates daily videos without web search when research is disabled", asyn
     assert.equal(requests[0].tools, undefined);
     assert.equal(result.format, "long");
     assert.equal(result.scenes.length, 18);
+    assert.deepEqual(result.sources, []);
+  } finally {
+    global.fetch = originalFetch;
+    if (originalApiKey === undefined) delete process.env.GEMINI_API_KEY;
+    else process.env.GEMINI_API_KEY = originalApiKey;
+  }
+});
+
+test("generates a Food video with uploaded narration without calling Gemini TTS", async () => {
+  const originalFetch = global.fetch;
+  const originalApiKey = process.env.GEMINI_API_KEY;
+  const requests = [];
+  process.env.GEMINI_API_KEY = "test-key";
+  global.fetch = async (url, options) => {
+    requests.push({ url: String(url), body: JSON.parse(options.body) });
+    return {
+      ok: true,
+      json: async () => ({
+        steps: [{
+          type: "model_output",
+          content: [{ type: "text", text: JSON.stringify(dailyVideo) }],
+        }],
+      }),
+    };
+  };
+  try {
+    const result = await createDailyVideo({
+      prompt: "Show a simple beginner recipe",
+      category: "food",
+      format: "short",
+      research: false,
+      voiceSource: "upload",
+    });
+    assert.equal(requests.length, 1);
+    assert.match(requests[0].body.input, /creator will narrate this script themself/i);
+    assert.equal(result.category, "food");
+    assert.equal(result.voiceSource, "upload");
+    assert.equal(result.audioBase64, undefined);
     assert.deepEqual(result.sources, []);
   } finally {
     global.fetch = originalFetch;

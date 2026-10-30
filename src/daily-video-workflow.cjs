@@ -39,6 +39,14 @@ const DAILY_VIDEO_CATEGORIES = [
     prompt: "Write a hopeful mini-story about a small act of kindness that changes someone's ordinary day.",
     colors: ["#201933", "#73528d", "#f1b3c2"],
   },
+  {
+    id: "food",
+    label: "Food",
+    icon: "♨",
+    tagline: "Recipes, cooking & ingredients",
+    prompt: "Show one easy, flavorful meal a beginner can cook with a few everyday ingredients.",
+    colors: ["#2b1d22", "#9b5942", "#f7d287"],
+  },
 ];
 
 function localDateKey(date = new Date()) {
