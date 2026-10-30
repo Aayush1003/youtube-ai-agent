@@ -89,6 +89,10 @@ const DAILY_VIDEO_CATEGORIES = {
     label: "Storytelling",
     direction: "Create an emotionally specific, original mini-story with a character goal, visual turning point, and satisfying ending.",
   },
+  food: {
+    label: "Food",
+    direction: "Create a practical food video such as a simple recipe, cooking technique, or ingredient explainer. Include realistic steps and clearly flag food-safety details; avoid unsupported nutrition or health claims.",
+  },
 };
 
 const DAILY_VIDEO_VOICE_STYLE =
@@ -106,13 +110,16 @@ function validateDailyVideoInput(input) {
     return "prompt must be between 1 and 500 characters.";
   }
   if (!Object.hasOwn(DAILY_VIDEO_CATEGORIES, input.category)) {
-    return "Choose gaming, education, technology, entertainment, or storytelling.";
+    return "Choose gaming, education, technology, entertainment, storytelling, or food.";
   }
   if (!["short", "long"].includes(input.format)) {
     return "Choose either short or long video format.";
   }
   if (typeof input.research !== "boolean") {
     return "Choose whether web research should be enabled.";
+  }
+  if (input.voiceSource !== undefined && !["ai", "upload"].includes(input.voiceSource)) {
+    return "Choose AI narration or upload your own voice.";
   }
   return null;
 }
@@ -131,6 +138,9 @@ function buildDailyVideoPrompt(input) {
     input.research
       ? "Use Google Search for relevant current context and factual claims; distinguish verified facts from ideas. Avoid making up evidence. Return only useful citations that informed the script."
       : "Do not depend on current web facts. Keep factual claims to reliable general knowledge and identify uncertainty rather than inventing details.",
+    input.voiceSource === "upload"
+      ? "The creator will narrate this script themself. Use natural spoken phrasing, clear pronunciation, and comfortable pauses."
+      : "Write for an expressive AI narrator; use natural spoken phrasing and clear pronunciation.",
     "Create original narration and visual ideas. Do not reproduce or imitate copyrighted scripts, lyrics, characters, game art, or footage. Do not impersonate real people. Keep the content suitable for a broad audience.",
     "Return only valid JSON with title, logline, scenes, and voiceover fields. Do not include markdown fences or extra commentary.",
   ].join("\n");
@@ -173,6 +183,17 @@ async function createDailyVideo(input) {
   const sources = extractInteractionCitations(interaction);
   if (input.research && sources.length === 0) {
     throw new Error("No verifiable web citations were returned. Try again or turn off web research.");
+  }
+
+  if (input.voiceSource === "upload") {
+    return {
+      ...video,
+      category: input.category,
+      format: input.format,
+      voiceSource: "upload",
+      sources,
+      audioMimeType: null,
+    };
   }
 
   const speechResponse = await fetch("https://generativelanguage.googleapis.com/v1beta/interactions", {
