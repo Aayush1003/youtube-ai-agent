@@ -11,6 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/styles.css">
     <script src="/app.js" defer></script>
+    <script src="/short-studio.bundle.js" defer></script>
   </head>
   <body>
     <header class="topbar">
@@ -20,7 +21,7 @@
         </span>
         <span class="brand-name">channel<span>craft</span></span>
       </a>
-      <div class="topbar-right"><span class="status-dot"></span><span>YOUR CREATOR WORKSPACE</span></div>
+      <div class="topbar-right"><span class="status-dot"></span><span>YOUR CREATOR WORKSPACE</span><a class="daily-nav-link" href="/daily-video-studio">Daily Video Studio ↗</a><a class="anime-nav-link" href="/anime-studio">Anime Story Studio ↗</a></div>
     </header>
 
     <main class="layout">
@@ -34,6 +35,16 @@
           <span class="mini-note-icon" aria-hidden="true">↗</span>
           <div><strong>Better videos start with better questions.</strong><p>Tell us who you make videos for. We’ll help with the next idea.</p></div>
         </div>
+        <a class="anime-entry-link" href="/anime-studio">
+          <span class="anime-entry-icon" aria-hidden="true">✦</span>
+          <span><strong>Make an original anime story</strong><small>Research fresh ideas, build a narrated video, and download it locally.</small></span>
+          <span class="anime-entry-arrow" aria-hidden="true">→</span>
+        </a>
+        <a class="daily-entry-link" href="/daily-video-studio">
+          <span class="daily-entry-icon" aria-hidden="true">▶</span>
+          <span><strong>Make a video in one prompt</strong><small>Gaming, education, tech, entertainment, and stories—with AI narration.</small></span>
+          <span class="daily-entry-arrow" aria-hidden="true">→</span>
+        </a>
       </section>
 
       <section class="workspace" aria-label="Video plan generator">
@@ -102,34 +113,8 @@
         <p class="results-disclaimer">Use these suggestions as a starting point. Tailor them to your voice, check factual claims, and let your audience’s response guide what you make next.</p>
       </section>
 
-      <section class="short-studio" aria-labelledby="short-studio-title">
-        <div class="tools-heading">
-          <span class="step-label">MADE FOR AAYUSH ENGINEERING HUB</span>
-          <h2 id="short-studio-title">Your first animated DSA Short<span class="heading-period">.</span></h2>
-          <p>A ready-to-record, vertical explainer about solving Two Sum with two pointers. Preview it, then export a video file to add your voice and publish.</p>
-        </div>
-        <div class="short-studio-card">
-          <div class="short-preview">
-            <canvas id="short-canvas" width="1080" height="1920" aria-label="Animated preview of a Two Sum tutorial Short"></canvas>
-            <div class="short-preview-badge"><span class="status-dot"></span> 9:16 SHORT PREVIEW</div>
-          </div>
-          <div class="short-details">
-            <span class="step-label">A COMPLETE 25-SECOND VIDEO</span>
-            <h3>Two Pointers: Two Sum in 20 Seconds</h3>
-            <p>See how sorting makes it possible to find a pair without checking every combination. The example uses [1, 2, 4, 6, 8] and target 10.</p>
-            <div class="short-actions">
-              <button class="copy-button" id="play-short" type="button">Play preview <span aria-hidden="true">▶</span></button>
-              <button class="submit-button short-export" id="export-short" type="button">Export video <span class="button-arrow" aria-hidden="true">↓</span></button>
-            </div>
-            <p class="short-status" id="short-status" role="status">Ready. The downloaded WebM is silent—record the voiceover below and add it in your editor.</p>
-            <div class="voiceover">
-              <div class="voiceover-heading"><h4>Voiceover script</h4><button class="copy-button" id="copy-voiceover" type="button">Copy script</button></div>
-              <p id="voiceover-script">Need to solve Two Sum fast? If the array is sorted, use two pointers. Start at both ends. One plus eight is nine, too small, so move the left pointer. Two plus eight is ten—we found the pair. Each step removes impossible options, so you get the answer in linear time instead of checking every pair. Follow Aayush Engineering Hub for more clear DSA walkthroughs.</p>
-            </div>
-            <p class="short-note">Exports as a silent WebM video from your browser. Add your own narration and review the example before uploading. No video is published automatically.</p>
-          </div>
-        </div>
-      </section>
+      <div id="short-studio-root"></div>
+      <div id="daily-java-short-root"></div>
 
       <section class="creator-tools" aria-labelledby="creator-tools-title">
         <div class="tools-heading">
