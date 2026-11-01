@@ -1,6 +1,7 @@
 const http = require("node:http");
 const fs = require("node:fs");
 const path = require("node:path");
+const { createDailyVideoAutomation, isValidDateKey } = require("./src/daily-video-automation.cjs");
 
 const PORT = Number(process.env.PORT) || 3000;
 const GEMINI_MODEL = "gemini-2.5-flash";
@@ -718,6 +719,11 @@ async function generateJavaShort(input) {
   };
 }
 
+const dailyVideoAutomation = createDailyVideoAutomation({
+  draftsDirectory: path.join(__dirname, "data", "daily-video-drafts"),
+  generateVideo: createDailyVideo,
+});
+
 function jsonResponse(response, status, payload) {
   response.writeHead(status, {
     "Content-Type": "application/json; charset=utf-8",
@@ -1120,8 +1126,67 @@ const API_OPERATIONS = {
   "/api/analytics-review": { validate: validateAnalyticsInput, run: reviewAnalytics },
 };
 
+async function handleDailyVideoAutomationRequest(request, response, url) {
+  const isAutomationRoute = url.pathname === "/api/daily-video/automation";
+  const draftsRoute = url.pathname.match(/^\/api\/daily-video\/drafts(?:\/([^/]+))?$/);
+  if (!isAutomationRoute && !draftsRoute) return false;
+
+  try {
+    if (isAutomationRoute && request.method === "GET") {
+      jsonResponse(response, 200, await dailyVideoAutomation.getStatus());
+      return true;
+    }
+
+    if (isAutomationRoute && request.method === "POST") {
+      if (!request.headers["content-type"]?.includes("application/json")) {
+        jsonResponse(response, 415, { error: "Send automation settings as application/json." });
+        return true;
+      }
+      const input = await readJsonBody(request);
+      if (!input || typeof input !== "object" || Array.isArray(input) || typeof input.enabled !== "boolean") {
+        jsonResponse(response, 400, { error: "Provide enabled as true or false." });
+        return true;
+      }
+      jsonResponse(response, 200, await dailyVideoAutomation.setEnabled(input.enabled));
+      return true;
+    }
+
+    if (draftsRoute && !draftsRoute[1] && request.method === "POST") {
+      const result = await dailyVideoAutomation.generateDraft(
+        (await dailyVideoAutomation.getStatus()).today
+      );
+      jsonResponse(response, 200, result);
+      return true;
+    }
+
+    if (draftsRoute && draftsRoute[1] && request.method === "GET") {
+      if (!isValidDateKey(draftsRoute[1])) {
+        jsonResponse(response, 400, { error: "Provide a valid YYYY-MM-DD date." });
+        return true;
+      }
+      const draft = await dailyVideoAutomation.loadDraft(draftsRoute[1]);
+      if (draft) jsonResponse(response, 200, draft);
+      else jsonResponse(response, 404, { error: "No saved draft exists for that date." });
+      return true;
+    }
+
+    response.setHeader("Allow", "GET, POST");
+    jsonResponse(response, 405, { error: "Method not allowed." });
+    return true;
+  } catch (error) {
+    if (error.statusCode) {
+      jsonResponse(response, error.statusCode, { error: error.message });
+      return true;
+    }
+    console.error("Daily video automation request failed:", error.message);
+    jsonResponse(response, 502, { error: error.message || "Daily video automation failed." });
+    return true;
+  }
+}
+
 async function handleRequest(request, response) {
   const url = new URL(request.url, "http://localhost");
+  if (await handleDailyVideoAutomationRequest(request, response, url)) return;
   const operation = API_OPERATIONS[url.pathname];
 
   if (operation) {
@@ -1194,6 +1259,9 @@ const server = http.createServer(handleRequest);
 if (require.main === module) {
   server.listen(PORT, "127.0.0.1", () => {
     console.log(`YouTube Growth Agent running at http://localhost:${PORT}`);
+    void dailyVideoAutomation.initialize().catch((error) => {
+      console.error("Unable to initialize daily video automation:", error.message);
+    });
   });
 }
 
@@ -1213,6 +1281,7 @@ module.exports = {
   searchAnimeIdeas,
   createAnimeVideo,
   createDailyVideo,
+  createDailyVideoAutomation,
   reviewAnalytics,
   validateAnalyticsInput,
   validateInput,

@@ -41,6 +41,12 @@ The separate Anime Story Studio at `/anime-studio` uses Gemini with Google Searc
 
 The **Daily Video Studio** at `/daily-video-studio` offers separate Gaming, Food, Education, Technology, Entertainment, and Storytelling categories. Choose one category, type one prompt, then generate a script and animated storyboard with optional web-grounded research and citations. Select a warm AI narrator or upload your own recording; uploaded audio stays in your browser and is combined with the animation locally. Short is selected by default; Long is also available. Download the finished WebM locally after reviewing it. Script generation requires `GEMINI_API_KEY` and Gemini Search grounding when research is enabled; AI narration additionally requires Gemini TTS access. The output uses animated graphics rather than generated gameplay footage. Your streak updates only after a successful download.
 
+### Daily engineering drafts
+
+In the Daily Video Studio, enable **Daily engineering drafts** to generate one Hinglish engineering/programming/practical-AI script, storyboard, and AI narration for `@EngineerAayushGupta` at 9:00 AM Asia/Kolkata. Formats alternate between Short and long video. This recurring job is opt-in because it uses Gemini API quota and may incur charges. It requires `GEMINI_API_KEY` and the local server to remain running; if enabled after 9:00 AM, it prepares that day's draft immediately. Drafts are stored locally under the ignored `data/daily-video-drafts` directory and can be reopened in the studio.
+
+The schedule does not render a finished WebM in the background or publish to YouTube. Open a saved draft in the studio to preview and download the browser-rendered video, then review it yourself. Automatic uploads are not enabled and require a separate Google OAuth/YouTube API integration.
+
 To use another port, set `PORT` before starting the server.
 
 ## Use the agent

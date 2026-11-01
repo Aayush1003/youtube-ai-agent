@@ -1,5 +1,8 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
+const fs = require("node:fs/promises");
+const os = require("node:os");
+const path = require("node:path");
 const {
   buildAnimeIdeasPrompt,
   buildAnimeVideoPrompt,
@@ -26,6 +29,13 @@ const {
   validateScheduleInput,
 } = require("./server");
 const { DAILY_VIDEO_CATEGORIES, calculateStreak: calculateDailyStreak } = require("./src/daily-video-workflow.cjs");
+const {
+  buildEngineeringPrompt,
+  createDailyVideoAutomation,
+  dateKeyInTimeZone,
+  formatForDate,
+  isValidDateKey,
+} = require("./src/daily-video-automation.cjs");
 const {
   JAVA_TOPIC_IDEAS,
   calculateStreak,
@@ -158,6 +168,106 @@ test("builds category-aware daily video prompts with optional grounded research"
   });
   assert.match(longPrompt, /five-minute, landscape/);
   assert.match(longPrompt, /Do not depend on current web facts/);
+});
+
+test("builds dated engineering prompts and alternates daily formats", () => {
+  assert.equal(isValidDateKey("2026-11-01"), true);
+  assert.equal(isValidDateKey("2026-02-30"), false);
+  assert.equal(isValidDateKey("today"), false);
+  assert.notEqual(formatForDate("2026-11-01"), formatForDate("2026-11-02"));
+  assert.equal(dateKeyInTimeZone(new Date("2026-11-01T04:00:00.000Z")), "2026-11-01");
+  const prompt = buildEngineeringPrompt("2026-11-01", ["A recent lesson"]);
+  assert.match(prompt, /@EngineerAayushGupta/);
+  assert.match(prompt, /natural Hinglish/);
+  assert.match(prompt, /A recent lesson/);
+});
+
+test("saves, reloads, and reuses a daily draft without generating it twice", async () => {
+  const draftsDirectory = await fs.mkdtemp(path.join(os.tmpdir(), "channelcraft-daily-"));
+  let generationCount = 0;
+  const automation = createDailyVideoAutomation({
+    draftsDirectory,
+    getApiKey: () => "test-key",
+    now: () => new Date("2026-11-01T04:00:00.000Z"),
+    generateVideo: async (input) => {
+      generationCount += 1;
+      return {
+        title: "A Hinglish engineering lesson",
+        logline: "One practical coding idea.",
+        scenes: Array.from({ length: input.format === "long" ? 18 : 6 }, (_, index) => ({
+          title: `Scene ${index + 1}`,
+          caption: "Learn one practical idea.",
+          setting: "A student project",
+          visualLabels: ["code", "idea"],
+        })),
+        voiceover: "A practical Hinglish explanation.",
+        category: input.category,
+        format: input.format,
+        voiceSource: "ai",
+        sources: [],
+        audioBase64: "AQID",
+        audioMimeType: "audio/wav",
+      };
+    },
+  });
+
+  try {
+    const first = await automation.generateDraft("2026-11-01");
+    const second = await automation.generateDraft("2026-11-01");
+    const loaded = await automation.loadDraft("2026-11-01");
+    const status = await automation.getStatus();
+    assert.equal(first.created, true);
+    assert.equal(second.created, false);
+    assert.equal(generationCount, 1);
+    assert.equal(first.draft.channel, "@EngineerAayushGupta");
+    assert.equal(loaded.audioBase64, "AQID");
+    assert.equal(status.todayDraft, true);
+    assert.equal(status.latestDrafts[0].title, "A Hinglish engineering lesson");
+  } finally {
+    await fs.rm(draftsDirectory, { recursive: true, force: true });
+  }
+});
+
+test("requires a Gemini key before enabling scheduled draft generation", async () => {
+  const draftsDirectory = await fs.mkdtemp(path.join(os.tmpdir(), "channelcraft-daily-"));
+  const automation = createDailyVideoAutomation({
+    draftsDirectory,
+    getApiKey: () => "",
+    generateVideo: async () => {
+      throw new Error("Generation should not run without an API key.");
+    },
+  });
+  try {
+    await assert.rejects(automation.setEnabled(true), {
+      statusCode: 503,
+      message: /GEMINI_API_KEY/,
+    });
+    assert.equal((await automation.getStatus()).enabled, false);
+  } finally {
+    await fs.rm(draftsDirectory, { recursive: true, force: true });
+  }
+});
+
+test("persists daily automation settings across instances", async () => {
+  const draftsDirectory = await fs.mkdtemp(path.join(os.tmpdir(), "channelcraft-daily-"));
+  const options = {
+    draftsDirectory,
+    getApiKey: () => "test-key",
+    now: () => new Date("2026-11-01T00:00:00.000Z"),
+    intervalMs: 60_000,
+    generateVideo: async () => {
+      throw new Error("The schedule should wait until 9:00 AM Asia/Kolkata.");
+    },
+  };
+  const automation = createDailyVideoAutomation(options);
+  try {
+    await automation.setEnabled(true);
+    await automation.setEnabled(false);
+    const restored = createDailyVideoAutomation(options);
+    assert.equal((await restored.getStatus()).enabled, false);
+  } finally {
+    await fs.rm(draftsDirectory, { recursive: true, force: true });
+  }
 });
 
 test("generates a researched daily video with citations and AI narration", async () => {

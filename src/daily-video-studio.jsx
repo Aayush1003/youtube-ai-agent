@@ -294,6 +294,9 @@ function DailyVideoStudio() {
     }
   });
   const [progress, setProgress] = useState(readProgress);
+  const [automation, setAutomation] = useState(null);
+  const [automationBusy, setAutomationBusy] = useState(false);
+  const [automationMessage, setAutomationMessage] = useState("");
   const [video, setVideo] = useState(null);
   const [storyDraft, setStoryDraft] = useState(null);
   const [voiceSource, setVoiceSource] = useState("ai");
@@ -308,6 +311,30 @@ function DailyVideoStudio() {
   const sceneIndex = video && video.duration
     ? Math.min(Math.floor((time / video.duration) * video.scenes.length), video.scenes.length - 1)
     : 0;
+
+  useEffect(() => {
+    let active = true;
+    async function refreshAutomation() {
+      try {
+        const response = await fetch("/api/daily-video/automation");
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || `The request failed (HTTP ${response.status}).`);
+        if (active) {
+          setAutomation(result);
+          setAutomationMessage(result.lastError || "");
+        }
+      } catch (refreshError) {
+        console.error("Could not load daily video automation:", refreshError);
+        if (active) setAutomationMessage(`Could not load the daily schedule: ${refreshError.message}`);
+      }
+    }
+    void refreshAutomation();
+    const timer = window.setInterval(refreshAutomation, 60_000);
+    return () => {
+      active = false;
+      window.clearInterval(timer);
+    };
+  }, []);
 
   function drawAt(currentVideo, currentTime) {
     if (canvasRef.current) drawFrame(canvasRef.current, currentVideo, currentTime);
@@ -363,7 +390,7 @@ function DailyVideoStudio() {
     saveSetting("channelcraft.daily-video-category", nextCategory, "Video category");
   }
 
-  function prepareVideo(generatedVideo, audioBlob, voiceLabel) {
+  function prepareVideo(generatedVideo, audioBlob, voiceLabel, videoFormat = format) {
     const audioUrl = URL.createObjectURL(audioBlob);
     const audio = new Audio();
     audio.preload = "auto";
@@ -382,10 +409,10 @@ function DailyVideoStudio() {
         setMode("idle");
         return;
       }
-      if (audio.duration > UPLOAD_DURATION_LIMIT[format]) {
+      if (audio.duration > UPLOAD_DURATION_LIMIT[videoFormat]) {
         URL.revokeObjectURL(audioUrl);
         audioRef.current = null;
-        setError(format === "short"
+        setError(videoFormat === "short"
           ? "Short narration exceeded 2 minutes. Choose Long or generate a tighter script."
           : "Long narration exceeded 10 minutes. Please generate a shorter script.");
         setMode("idle");
@@ -393,15 +420,16 @@ function DailyVideoStudio() {
       }
       const readyVideo = { ...generatedVideo, audioUrl, duration: audio.duration };
       if (canvasRef.current) {
-        canvasRef.current.width = format === "long" ? 1920 : 1080;
-        canvasRef.current.height = format === "long" ? 1080 : 1920;
+        canvasRef.current.width = videoFormat === "long" ? 1920 : 1080;
+        canvasRef.current.height = videoFormat === "long" ? 1080 : 1920;
       }
       setVideo(readyVideo);
       setStoryDraft(null);
       setTime(0);
       setMode("ready");
       setError("");
-      setStatus(`Your ${category.label.toLowerCase()} video is ready with ${voiceLabel} (${formatDuration(audio.duration)}). Preview it or download the WebM.`);
+      const videoCategory = CATEGORY_BY_ID[generatedVideo.category] || category;
+      setStatus(`Your ${videoCategory.label.toLowerCase()} video is ready with ${voiceLabel} (${formatDuration(audio.duration)}). Preview it or download the WebM.`);
     }, { once: true });
     audio.src = audioUrl;
   }
@@ -496,6 +524,95 @@ function DailyVideoStudio() {
       setError(generationError.message);
       setStatus("The video could not be generated.");
       setMode("idle");
+    }
+  }
+
+  async function changeDailyAutomation(enabled) {
+    if (automationBusy) return;
+    if (enabled && !window.confirm(
+      "Enable a daily Gemini-generated engineering draft at 9:00 AM Asia/Kolkata? This uses your Gemini API quota and may incur charges. It will not upload or publish anything."
+    )) return;
+    setAutomationBusy(true);
+    setAutomationMessage(enabled ? "Enabling the daily draft schedule…" : "Pausing the daily draft schedule…");
+    try {
+      const response = await fetch("/api/daily-video/automation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ enabled }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || `The request failed (HTTP ${response.status}).`);
+      setAutomation(result);
+      setAutomationMessage(enabled
+        ? "Daily drafts are enabled. The server will prepare one at 9:00 AM Asia/Kolkata."
+        : "Daily drafts are paused.");
+    } catch (automationError) {
+      setAutomationMessage(automationError.message);
+    } finally {
+      setAutomationBusy(false);
+    }
+  }
+
+  function loadDailyDraft(draft) {
+    if (typeof draft.audioBase64 !== "string" || !draft.audioBase64) {
+      throw new Error("The saved daily draft has no narration audio.");
+    }
+    clearAudio();
+    setVideo(null);
+    setStoryDraft(null);
+    setCategoryId(draft.category || "education");
+    setFormat(draft.format);
+    setVoiceSource("ai");
+    setTime(0);
+    setError("");
+    setMode("generating");
+    const audioBytes = Uint8Array.from(atob(draft.audioBase64), (character) => character.charCodeAt(0));
+    const { audioBase64, ...generatedVideo } = draft;
+    prepareVideo(
+      generatedVideo,
+      new Blob([audioBytes], { type: draft.audioMimeType || "audio/wav" }),
+      "AI narration",
+      draft.format
+    );
+  }
+
+  async function createDailyDraftNow() {
+    if (automationBusy) return;
+    setAutomationBusy(true);
+    setAutomationMessage("Creating today's engineering script, storyboard, and narration…");
+    try {
+      const response = await fetch("/api/daily-video/drafts", { method: "POST" });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || `The request failed (HTTP ${response.status}).`);
+      loadDailyDraft(result.draft);
+      setAutomationMessage(result.created
+        ? "Today's draft is ready to review. Preview and download the video when you’re ready."
+        : "Today's saved draft is ready to review.");
+      const statusResponse = await fetch("/api/daily-video/automation");
+      const statusResult = await statusResponse.json();
+      if (!statusResponse.ok) throw new Error(statusResult.error || `The request failed (HTTP ${statusResponse.status}).`);
+      setAutomation(statusResult);
+    } catch (draftError) {
+      setAutomationMessage(draftError.message);
+    } finally {
+      setAutomationBusy(false);
+    }
+  }
+
+  async function reviewTodayDraft() {
+    if (automationBusy || !automation?.today) return;
+    setAutomationBusy(true);
+    setAutomationMessage("Loading today's saved engineering draft…");
+    try {
+      const response = await fetch(`/api/daily-video/drafts/${automation.today}`);
+      const draft = await response.json();
+      if (!response.ok) throw new Error(draft.error || `The request failed (HTTP ${response.status}).`);
+      loadDailyDraft(draft);
+      setAutomationMessage("Today's draft is ready to review. Preview and download the video when you’re ready.");
+    } catch (draftError) {
+      setAutomationMessage(draftError.message);
+    } finally {
+      setAutomationBusy(false);
     }
   }
 
@@ -674,6 +791,55 @@ function DailyVideoStudio() {
             <strong>{progress.streak} day{progress.streak === 1 ? "" : "s"} ✦</strong>
             <span>video-making streak</span>
           </div>
+        </section>
+
+        <section className="daily-automation-panel" aria-labelledby="daily-automation-title">
+          <div className="daily-automation-copy">
+            <span className="daily-step">YOUR DAILY ENGINEERING DRAFT</span>
+            <h2 id="daily-automation-title">@EngineerAayushGupta · 9:00 AM IST</h2>
+            <p>
+              {automation
+                ? `Hinglish programming and practical-AI ideas, alternating ${automation.todayFormat === "short" ? "Short today" : "long video today"} with the other format tomorrow.`
+                : "Hinglish programming and practical-AI ideas, alternating Shorts and long videos."}
+              {" "}AI prepares the script, storyboard, and narration. You review and download the finished WebM; nothing is uploaded.
+            </p>
+            <p className="daily-automation-requirement">
+              {automation?.apiConfigured
+                ? "Requires this server to stay running and Gemini API access. Daily generation uses your Gemini quota and may incur charges."
+                : "Set GEMINI_API_KEY on the server to enable scheduled drafts. The browser renders the final WebM when you review it."}
+            </p>
+          </div>
+          <div className="daily-automation-actions">
+            <span className={`daily-automation-state${automation?.enabled ? " is-enabled" : ""}`}>
+              {automation?.enabled ? "Daily schedule on" : "Daily schedule off"}
+            </span>
+            <button
+              className="daily-automation-button"
+              type="button"
+              onClick={() => changeDailyAutomation(!automation?.enabled)}
+              disabled={!automation || automationBusy || (!automation.enabled && !automation.apiConfigured)}
+            >
+              {automationBusy ? "Working…" : automation?.enabled ? "Pause daily drafts" : "Enable daily drafts"}
+            </button>
+            <button
+              className="daily-copy-button"
+              type="button"
+              onClick={createDailyDraftNow}
+              disabled={!automation?.apiConfigured || automationBusy}
+            >
+              Create today’s draft now
+            </button>
+            {automation?.todayDraft && (
+              <button className="daily-copy-button" type="button" onClick={reviewTodayDraft} disabled={automationBusy}>
+                Review today’s saved draft
+              </button>
+            )}
+          </div>
+          <p className="daily-automation-status" role={automationMessage ? "alert" : "status"}>
+            {automationMessage || (automation?.enabled
+              ? "The schedule runs when the local server is online; after 9:00 AM it creates at most one draft for the day."
+              : "Turn on the schedule to create one saved draft per day. You can pause it any time.")}
+          </p>
         </section>
 
         <section aria-labelledby="daily-categories-title">
