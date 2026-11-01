@@ -12,11 +12,24 @@ let latestPlan = null;
 let latestBrief = null;
 let ideaNumber = 0;
 
-document.querySelector("#channel-quick-start").addEventListener("click", () => {
-  form.elements.stage.value = "growing";
-  form.elements.format.value = "both";
-  form.elements.goal.value = "views";
-  form.requestSubmit();
+document.querySelectorAll(".signal-choice").forEach((choice) => {
+  choice.addEventListener("click", () => {
+    document.querySelectorAll(".signal-choice").forEach((item) => {
+      const selected = item === choice;
+      item.classList.toggle("is-active", selected);
+      item.setAttribute("aria-pressed", String(selected));
+    });
+
+    let visibleVideos = 0;
+    document.querySelectorAll(".human-video-card").forEach((card) => {
+      const visible = choice.dataset.topic === "all" || card.dataset.videoTopic === choice.dataset.topic;
+      card.hidden = !visible;
+      if (visible) visibleVideos += 1;
+    });
+    document.querySelector("#signal-count").textContent =
+      `${String(visibleVideos).padStart(2, "0")} ${visibleVideos === 1 ? "VIDEO" : "VIDEOS"}`;
+    document.querySelector("#youtube-search-query").value = choice.dataset.query;
+  });
 });
 
 function addTextCard(title, content, wide = false) {

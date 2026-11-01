@@ -72,7 +72,7 @@ function buildEngineeringPrompt(dateKey, previousTitles = []) {
     `Create an original engineering/programming lesson for the ${CHANNEL_HANDLE} channel.`,
     `Topic focus for ${dateKey}: ${topic}.`,
     "Teach Indian engineering students and curious beginners in natural Hinglish, using Roman Hindi mixed with standard English technical terms.",
-    "Use one concrete example, explain the limits of the example, and end with one useful takeaway. Keep technical claims accurate; do not invent benchmark numbers, news, APIs, or code behavior.",
+    "Start from a recognizable learner problem, then use one concrete example to make the idea click. Explain the limits of the example and end with one useful, encouraging next step. Keep technical claims accurate; do not invent benchmark numbers, news, APIs, or code behavior.",
     recentTitles.length
       ? `Make today's idea clearly different from these recent video titles: ${recentTitles.join(" | ")}.`
       : "Choose a specific, beginner-friendly angle rather than a broad overview.",

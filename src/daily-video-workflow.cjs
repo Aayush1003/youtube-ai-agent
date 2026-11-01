@@ -49,6 +49,25 @@ const DAILY_VIDEO_CATEGORIES = [
   },
 ];
 
+const HUMAN_STORY_STARTER = {
+  title: "The Note on Dryer Four",
+  logline: "One late-night note on a laundromat dryer becomes a quiet conversation between strangers.",
+  category: "storytelling",
+  format: "short",
+  voiceSource: "upload",
+  storyStyle: "laundromat-note",
+  sources: [],
+  scenes: [
+    { title: "Dryer Four", caption: "Someone left a note on Dryer Four.", setting: "A laundromat after midnight", visualLabels: ["dryer four", "last cycle"], focusText: "SOMEONE LEFT A NOTE..." },
+    { title: "A difficult day", caption: "“If today was hard, you made it here.”", setting: "A tired stranger waiting for laundry", visualLabels: ["paper note", "midnight"], focusText: "IF TODAY WAS HARD,\nYOU STILL MADE IT HERE." },
+    { title: "Maya replies", caption: "She turns the paper over. “So did you.”", setting: "One pen. The back of the note.", visualLabels: ["blue ink", "small reply"], focusText: "SO DID YOU." },
+    { title: "Someone answers", caption: "By morning: “We made it.”", setting: "The same dryer, a new morning", visualLabels: ["morning light", "new reply"], focusText: "WE MADE IT." },
+    { title: "By Friday", caption: "No names. Just proof you aren't alone.", setting: "A paper filled in many handwritings", visualLabels: ["many notes", "Friday"], focusText: "WE MADE IT.\n— SOMEONE ELSE" },
+    { title: "Your turn", caption: "The next person is already reaching for the pen.", setting: "A fresh page on Dryer Four", visualLabels: ["fresh page", "your turn"], focusText: "YOUR TURN." },
+  ],
+  voiceover: "At midnight, someone left a note on Dryer Four: “If today was hard, you still made it here.” Maya found it with wet sleeves, a dead phone, and three minutes left on the cycle. She almost smiled. Then she turned the paper over and wrote, “So did you.” By morning, a stranger had added, “We made it.” On Friday, the scrap was full. No names. No advice. Just little proof that other people were carrying things you couldn’t see. Maya came back for one forgotten sock. The note was gone. A clean sheet sat in its place. She picked up the pen. “Your turn.” The next person was already reaching for it.",
+};
+
 function localDateKey(date = new Date()) {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -75,6 +94,7 @@ function calculateStreak(completedDates, today = localDateKey()) {
 
 module.exports = {
   DAILY_VIDEO_CATEGORIES,
+  HUMAN_STORY_STARTER,
   calculateStreak,
   dateOffset,
   localDateKey,

@@ -28,7 +28,11 @@ const {
   validateJavaShortInput,
   validateScheduleInput,
 } = require("./server");
-const { DAILY_VIDEO_CATEGORIES, calculateStreak: calculateDailyStreak } = require("./src/daily-video-workflow.cjs");
+const {
+  DAILY_VIDEO_CATEGORIES,
+  HUMAN_STORY_STARTER,
+  calculateStreak: calculateDailyStreak,
+} = require("./src/daily-video-workflow.cjs");
 const {
   buildEngineeringPrompt,
   createDailyVideoAutomation,
@@ -106,6 +110,21 @@ test("counts only consecutive video-download days for the streak", () => {
   assert.equal(calculateStreak([], "2025-04-12"), 0);
 });
 
+test("provides an original offline Storytelling Short for cross-audience inspiration", () => {
+  assert.equal(HUMAN_STORY_STARTER.category, "storytelling");
+  assert.equal(HUMAN_STORY_STARTER.format, "short");
+  assert.equal(HUMAN_STORY_STARTER.voiceSource, "upload");
+  assert.equal(HUMAN_STORY_STARTER.storyStyle, "laundromat-note");
+  assert.equal(HUMAN_STORY_STARTER.scenes.length, 6);
+  assert.ok(HUMAN_STORY_STARTER.scenes.every((scene) => scene.caption.length <= 100));
+  assert.ok(HUMAN_STORY_STARTER.scenes.every((scene) => scene.visualLabels.length >= 2));
+  assert.ok(HUMAN_STORY_STARTER.scenes.every((scene) => scene.focusText));
+  const wordCount = HUMAN_STORY_STARTER.voiceover.trim().split(/\s+/).length;
+  assert.ok(wordCount >= 100 && wordCount <= 125, `expected a Short-length script, got ${wordCount} words`);
+  assert.match(HUMAN_STORY_STARTER.voiceover, /At midnight, someone left a note on Dryer Four/);
+  assert.match(HUMAN_STORY_STARTER.voiceover, /No names\. No advice\./);
+});
+
 test("validates a Hinglish Java Short concept", () => {
   const validInput = { concept: "HashMap", language: "Hinglish", format: "short", voiceSource: "ai" };
   assert.equal(validateJavaShortInput(validInput), null);
@@ -158,6 +177,9 @@ test("builds category-aware daily video prompts with optional grounded research"
   });
   assert.match(researchPrompt, /gaming/);
   assert.match(researchPrompt, /60-second vertical/);
+  assert.match(researchPrompt, /Make the viewer feel understood, not targeted/);
+  assert.match(researchPrompt, /never fear, shame, or fake suspense/);
+  assert.match(researchPrompt, /visually specific to its moment/);
   assert.match(researchPrompt, /Google Search/);
   assert.match(researchPrompt, /Do not reproduce or imitate copyrighted/);
   const longPrompt = buildDailyVideoPrompt({
@@ -179,6 +201,7 @@ test("builds dated engineering prompts and alternates daily formats", () => {
   const prompt = buildEngineeringPrompt("2026-11-01", ["A recent lesson"]);
   assert.match(prompt, /@EngineerAayushGupta/);
   assert.match(prompt, /natural Hinglish/);
+  assert.match(prompt, /recognizable learner problem/);
   assert.match(prompt, /A recent lesson/);
 });
 
@@ -527,6 +550,7 @@ test("builds a concise technical prompt and validates the generated Java Short",
   assert.match(buildJavaShortPrompt(shortInput), /Hinglish/);
   assert.match(buildJavaShortPrompt(shortInput), /60-second vertical/);
   assert.match(buildJavaShortPrompt(shortInput), /warm, sincere Hinglish mentor/i);
+  assert.match(buildJavaShortPrompt(shortInput), /familiar coding question or moment of confusion/);
   assert.match(buildJavaShortPrompt(shortInput), /avoid hype, guilt, grand promises/i);
   assert.match(buildJavaShortPrompt(longInput), /five-minute, landscape/);
   assert.match(buildJavaShortPrompt(longInput), /upload their own narration/);

@@ -2,13 +2,221 @@ import React, { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import workflow from "./daily-video-workflow.cjs";
 
-const { DAILY_VIDEO_CATEGORIES, calculateStreak, localDateKey } = workflow;
+const { DAILY_VIDEO_CATEGORIES, HUMAN_STORY_STARTER, calculateStreak, localDateKey } = workflow;
 const CATEGORY_BY_ID = Object.fromEntries(DAILY_VIDEO_CATEGORIES.map((category) => [category.id, category]));
 const PROGRESS_KEY = "channelcraft.daily-video-progress";
 const PROMPT_KEY = "channelcraft.daily-video-prompt";
 const FORMAT_KEY = "channelcraft.daily-video-format";
 const RESEARCH_KEY = "channelcraft.daily-video-research";
 const UPLOAD_DURATION_LIMIT = { short: 120, long: 600 };
+
+function drawLaundromatFrame(context, video, time, sceneIndex, scene, width, height, unit) {
+  const progress = video.duration ? Math.max(0, Math.min(time / video.duration, 1)) : 0;
+  const dawn = Math.max(0, (progress - 0.42) / 0.58);
+  const background = context.createLinearGradient(0, 0, width * 0.82, height);
+  background.addColorStop(0, `rgb(${Math.round(15 + dawn * 36)}, ${Math.round(24 + dawn * 26)}, ${Math.round(37 + dawn * 10)})`);
+  background.addColorStop(0.58, `rgb(${Math.round(27 + dawn * 52)}, ${Math.round(42 + dawn * 27)}, ${Math.round(55 + dawn * 5)})`);
+  background.addColorStop(1, "#171b20");
+  context.fillStyle = background;
+  context.fillRect(0, 0, width, height);
+
+  const windowX = width * 0.075;
+  const windowY = height * 0.17;
+  const windowWidth = width * 0.85;
+  const windowHeight = height * 0.255;
+  const windowGlow = context.createLinearGradient(0, windowY, 0, windowY + windowHeight);
+  windowGlow.addColorStop(0, `rgba(${Math.round(94 + dawn * 91)},${Math.round(143 + dawn * 48)},${Math.round(180 + dawn * 12)},.43)`);
+  windowGlow.addColorStop(1, "rgba(35,47,58,.68)");
+  context.fillStyle = windowGlow;
+  context.fillRect(windowX, windowY, windowWidth, windowHeight);
+
+  context.save();
+  context.beginPath();
+  context.rect(windowX, windowY, windowWidth, windowHeight);
+  context.clip();
+  for (let index = 0; index < 38; index += 1) {
+    const x = windowX + (((index * 173 + 29) % 991) / 991) * windowWidth;
+    const y = windowY + (((index * 239 + 47 + time * (35 + (index % 4) * 11)) % 997) / 997) * windowHeight;
+    context.globalAlpha = 0.2 + ((index * 13) % 5) * 0.07;
+    context.strokeStyle = dawn > 0.25 ? "#fff0d3" : "#c8e3f1";
+    context.lineWidth = Math.max(1, unit * 0.0014);
+    context.beginPath();
+    context.moveTo(x, y);
+    context.lineTo(x - unit * 0.008, y + unit * 0.042);
+    context.stroke();
+  }
+  context.restore();
+
+  const tileSize = unit * 0.085;
+  context.globalAlpha = 0.16;
+  context.strokeStyle = "#d5d4c6";
+  context.lineWidth = Math.max(1, unit * 0.001);
+  for (let x = 0; x <= width; x += tileSize) {
+    context.beginPath();
+    context.moveTo(x, height * 0.43);
+    context.lineTo(x, height * 0.78);
+    context.stroke();
+  }
+  for (let y = height * 0.43; y <= height * 0.78; y += tileSize) {
+    context.beginPath();
+    context.moveTo(0, y);
+    context.lineTo(width, y);
+    context.stroke();
+  }
+  context.globalAlpha = 1;
+
+  const floor = context.createLinearGradient(0, height * 0.73, 0, height);
+  floor.addColorStop(0, "#363b3d");
+  floor.addColorStop(1, "#171b1f");
+  context.fillStyle = floor;
+  context.beginPath();
+  context.moveTo(0, height * 0.73);
+  context.lineTo(width, height * 0.73);
+  context.lineTo(width, height);
+  context.lineTo(0, height);
+  context.closePath();
+  context.fill();
+  for (let index = 0; index < 8; index += 1) {
+    const y = height * (0.78 + index * 0.027);
+    context.strokeStyle = `rgba(218,218,198,${0.04 + index * 0.006})`;
+    context.lineWidth = Math.max(1, unit * 0.001);
+    context.beginPath();
+    context.moveTo(0, y);
+    context.lineTo(width, y);
+    context.stroke();
+  }
+
+  const drawWasher = (x, y, washerWidth, washerHeight, doorSize, label) => {
+    context.fillStyle = "#343e43";
+    context.fillRect(x, y, washerWidth, washerHeight);
+    context.fillStyle = "#8b9b9b";
+    context.fillRect(x + washerWidth * 0.06, y + washerHeight * 0.04, washerWidth * 0.88, washerHeight * 0.06);
+    context.fillStyle = "#b5d1bd";
+    context.font = `700 ${Math.max(12, unit * 0.017)}px Arial, sans-serif`;
+    context.textAlign = "left";
+    context.fillText(label, x + washerWidth * 0.1, y + washerHeight * 0.185);
+    const cx = x + washerWidth * 0.5;
+    const cy = y + washerHeight * 0.61;
+    context.fillStyle = "#20282d";
+    context.beginPath();
+    context.arc(cx, cy, doorSize * 0.57, 0, Math.PI * 2);
+    context.fill();
+    context.strokeStyle = "#bac1b8";
+    context.lineWidth = Math.max(3, unit * 0.009);
+    context.beginPath();
+    context.arc(cx, cy, doorSize * 0.52, 0, Math.PI * 2);
+    context.stroke();
+    context.strokeStyle = `rgba(166,198,197,${0.24 + Math.sin(time + label.length) * 0.04})`;
+    context.lineWidth = Math.max(2, unit * 0.004);
+    context.beginPath();
+    context.arc(cx, cy, doorSize * 0.39, time * 0.4, time * 0.4 + Math.PI * 1.4);
+    context.stroke();
+    context.fillStyle = "rgba(197,217,199,.75)";
+    context.beginPath();
+    context.ellipse(cx + Math.cos(time * 0.5) * doorSize * 0.1, cy + Math.sin(time * 0.5) * doorSize * 0.1, doorSize * 0.09, doorSize * 0.045, time, 0, Math.PI * 2);
+    context.fill();
+  };
+
+  drawWasher(width * 0.035, height * 0.52, width * 0.25, height * 0.24, unit * 0.1, "02");
+  drawWasher(width * 0.72, height * 0.52, width * 0.25, height * 0.24, unit * 0.1, "06");
+  const dryerX = width * 0.265;
+  const dryerY = height * 0.425;
+  const dryerWidth = width * 0.47;
+  const dryerHeight = height * 0.315;
+  drawWasher(dryerX, dryerY, dryerWidth, dryerHeight, unit * 0.225, "DRYER 04");
+
+  if (sceneIndex === 2 || sceneIndex === 4) {
+    const personX = width * (sceneIndex === 2 ? 0.19 : 0.82);
+    const personY = height * 0.66;
+    const scale = unit * 0.13;
+    context.fillStyle = sceneIndex === 2 ? "#242a34" : "#29312d";
+    context.beginPath();
+    context.ellipse(personX, personY + scale * 0.6, scale * 0.46, scale * 0.7, 0, Math.PI, 0);
+    context.fill();
+    context.fillStyle = "#d4ab88";
+    context.beginPath();
+    context.arc(personX, personY, scale * 0.29, 0, Math.PI * 2);
+    context.fill();
+    context.fillStyle = "#302a2b";
+    context.beginPath();
+    context.arc(personX, personY - scale * 0.05, scale * 0.3, Math.PI, Math.PI * 2);
+    context.fill();
+  }
+
+  const paperWidth = width * 0.58;
+  const paperHeight = height * (sceneIndex === 4 ? 0.13 : 0.155);
+  const paperX = (width - paperWidth) / 2;
+  const paperY = height * (sceneIndex === 5 ? 0.405 : 0.39);
+  context.save();
+  context.translate(width * 0.5, paperY + paperHeight * 0.5 + Math.sin(time * 0.7) * unit * 0.003);
+  context.rotate(Math.sin(time * 0.42) * 0.012);
+  context.shadowColor = "rgba(0,0,0,.4)";
+  context.shadowBlur = unit * 0.026;
+  context.shadowOffsetY = unit * 0.008;
+  context.fillStyle = sceneIndex === 5 ? "#f5ecd7" : "#f1e8d2";
+  context.fillRect(-paperWidth / 2, -paperHeight / 2, paperWidth, paperHeight);
+  context.shadowColor = "transparent";
+  context.shadowBlur = 0;
+  context.shadowOffsetY = 0;
+  context.fillStyle = "#4a483e";
+  context.textAlign = "center";
+  context.textBaseline = "middle";
+  const focusLines = (scene.focusText || "").split("\n");
+  const focusFont = Math.max(19, unit * (sceneIndex === 5 ? 0.052 : 0.039));
+  context.font = `italic 600 ${focusFont}px Georgia, serif`;
+  focusLines.forEach((line, index) => {
+    context.fillText(line, 0, (index - (focusLines.length - 1) / 2) * focusFont * 1.4, paperWidth * 0.88);
+  });
+  context.textBaseline = "alphabetic";
+  context.restore();
+
+  const labelFont = Math.max(13, unit * 0.017);
+  context.textAlign = "left";
+  context.fillStyle = "rgba(245,238,219,.82)";
+  context.font = `700 ${labelFont}px Arial, sans-serif`;
+  context.fillText("AN ORIGINAL STORY · FICTION", width * 0.065, height * 0.065);
+  context.textAlign = "right";
+  context.fillStyle = "rgba(245,238,219,.68)";
+  context.fillText(`${String(sceneIndex + 1).padStart(2, "0")} / ${String(video.scenes.length).padStart(2, "0")}`, width * 0.935, height * 0.065);
+
+  const titleFont = Math.max(23, unit * (sceneIndex === 0 ? 0.055 : 0.036));
+  context.textAlign = "center";
+  context.fillStyle = "#fff6e3";
+  context.shadowColor = "rgba(4,8,13,.5)";
+  context.shadowBlur = unit * 0.018;
+  context.font = `700 ${titleFont}px Georgia, serif`;
+  context.fillText(sceneIndex === 0 ? "THE NOTE ON DRYER FOUR" : scene.title.toUpperCase(), width / 2, height * 0.12, width * 0.86);
+  context.shadowBlur = 0;
+
+  context.fillStyle = "rgba(10,14,18,.73)";
+  context.fillRect(0, height * 0.795, width, height * 0.13);
+  context.textAlign = "center";
+  context.textBaseline = "middle";
+  context.fillStyle = "#fff8e9";
+  context.font = `500 ${Math.max(20, unit * 0.025)}px Georgia, serif`;
+  const captionLines = [];
+  let captionLine = "";
+  for (const word of scene.caption.split(/\s+/)) {
+    const candidate = captionLine ? `${captionLine} ${word}` : word;
+    if (captionLine && context.measureText(candidate).width > width * 0.84) {
+      captionLines.push(captionLine);
+      captionLine = word;
+    } else {
+      captionLine = candidate;
+    }
+  }
+  if (captionLine) captionLines.push(captionLine);
+  const captionLineHeight = unit * 0.035;
+  captionLines.slice(0, 3).forEach((line, index) => {
+    context.fillText(line, width / 2, height * 0.86 + (index - (Math.min(captionLines.length, 3) - 1) / 2) * captionLineHeight, width * 0.88);
+  });
+  context.textBaseline = "alphabetic";
+
+  context.fillStyle = "rgba(228,225,209,.18)";
+  context.fillRect(width * 0.065, height * 0.94, width * 0.87, Math.max(4, unit * 0.005));
+  context.fillStyle = "#c8d39c";
+  context.fillRect(width * 0.065, height * 0.94, width * 0.87 * progress, Math.max(4, unit * 0.005));
+}
 
 function drawFrame(canvas, video, time) {
   const context = canvas.getContext("2d");
@@ -24,6 +232,10 @@ function drawFrame(canvas, video, time) {
   const scene = video.scenes[sceneIndex];
   const progress = video.duration ? elapsed / video.duration : 0;
   const [base, mid, accent] = category.colors;
+  if (video.storyStyle === "laundromat-note") {
+    drawLaundromatFrame(context, video, elapsed, sceneIndex, scene, width, height, minDimension);
+    return;
+  }
   const background = context.createLinearGradient(0, 0, width * 0.4, height);
   background.addColorStop(0, base);
   background.addColorStop(0.65, mid);
@@ -233,6 +445,78 @@ function drawFrame(canvas, video, time) {
   context.fillRect(width * 0.065, height * 0.94, width * 0.87 * progress, Math.max(4, minDimension * 0.005));
 }
 
+function createStorySoundscape(duration = 58) {
+  const sampleRate = 22050;
+  const frameCount = Math.ceil(sampleRate * duration);
+  const channelCount = 2;
+  const dataLength = frameCount * channelCount * 2;
+  const wav = new ArrayBuffer(44 + dataLength);
+  const view = new DataView(wav);
+  const writeText = (offset, value) => {
+    for (let index = 0; index < value.length; index += 1) {
+      view.setUint8(offset + index, value.charCodeAt(index));
+    }
+  };
+  writeText(0, "RIFF");
+  view.setUint32(4, 36 + dataLength, true);
+  writeText(8, "WAVE");
+  writeText(12, "fmt ");
+  view.setUint32(16, 16, true);
+  view.setUint16(20, 1, true);
+  view.setUint16(22, channelCount, true);
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, sampleRate * channelCount * 2, true);
+  view.setUint16(32, channelCount * 2, true);
+  view.setUint16(34, 16, true);
+  writeText(36, "data");
+  view.setUint32(40, dataLength, true);
+
+  const chords = [
+    [146.83, 174.61, 220],
+    [130.81, 164.81, 196],
+    [110, 146.83, 174.61],
+    [130.81, 164.81, 220],
+  ];
+  let noiseLeft = 0;
+  let noiseRight = 0;
+  for (let frame = 0; frame < frameCount; frame += 1) {
+    const time = frame / sampleRate;
+    const chordPosition = time / (duration / chords.length);
+    const chordIndex = Math.min(Math.floor(chordPosition), chords.length - 1);
+    const chordBlend = Math.min(1, (chordPosition - chordIndex) * 2);
+    const nextChord = chords[Math.min(chordIndex + 1, chords.length - 1)];
+    const fade = Math.min(1, time / 2.2, (duration - time) / 3.5);
+    const swell = 0.74 + Math.sin((time / duration) * Math.PI) * 0.26;
+    const whiteLeft = Math.random() * 2 - 1;
+    const whiteRight = Math.random() * 2 - 1;
+    noiseLeft = noiseLeft * 0.89 + whiteLeft * 0.11;
+    noiseRight = noiseRight * 0.89 + whiteRight * 0.11;
+    let pad = 0;
+    for (let note = 0; note < 3; note += 1) {
+      const frequency = chords[chordIndex][note] * (1 - chordBlend) + nextChord[note] * chordBlend;
+      pad += Math.sin(time * frequency * Math.PI * 2 + note * 0.12) / (note + 1);
+    }
+    const rain = 0.12 * noiseLeft + 0.055 * (whiteLeft - noiseLeft);
+    const warmPad = pad * (0.024 + swell * 0.009);
+    let chime = 0;
+    for (const bellTime of [10.5, 29, 48]) {
+      const bellAge = time - bellTime;
+      if (bellAge >= 0 && bellAge < 2.6) {
+        chime +=
+          (Math.sin(bellAge * 880 * Math.PI * 2) * 0.012 +
+            Math.sin(bellAge * 1320 * Math.PI * 2) * 0.006) *
+          Math.exp(-bellAge * 2.4);
+      }
+    }
+    const left = Math.max(-0.88, Math.min(0.88, (rain + warmPad + chime) * fade));
+    const right = Math.max(-0.88, Math.min(0.88, (0.12 * noiseRight + 0.055 * (whiteRight - noiseRight) + warmPad + chime) * fade));
+    const offset = 44 + frame * channelCount * 2;
+    view.setInt16(offset, Math.round(left * 32767), true);
+    view.setInt16(offset + 2, Math.round(right * 32767), true);
+  }
+  return new Blob([wav], { type: "audio/wav" });
+}
+
 function formatDuration(seconds) {
   const total = Math.ceil(seconds);
   const minutes = Math.floor(total / 60);
@@ -390,6 +674,38 @@ function DailyVideoStudio() {
     saveSetting("channelcraft.daily-video-category", nextCategory, "Video category");
   }
 
+  async function loadHumanStoryStarter() {
+    if (busy) return;
+    clearAudio();
+    setVideo(null);
+    setStoryDraft(HUMAN_STORY_STARTER);
+    setCategoryId(HUMAN_STORY_STARTER.category);
+    setFormat(HUMAN_STORY_STARTER.format);
+    setVoiceSource(HUMAN_STORY_STARTER.voiceSource);
+    setResearch(false);
+    setVoiceFile(null);
+    if (voiceInputRef.current) voiceInputRef.current.value = "";
+    setTime(0);
+    setError("");
+    setMode("generating");
+    setStatus("Composing original rain, warm score, and scene-by-scene story art locally…");
+    saveSetting("channelcraft.daily-video-category", HUMAN_STORY_STARTER.category, "Video category");
+    saveSetting(FORMAT_KEY, HUMAN_STORY_STARTER.format, "Video format");
+    saveSetting("channelcraft.daily-video-voice", HUMAN_STORY_STARTER.voiceSource, "Narration preference");
+    saveSetting(RESEARCH_KEY, "false", "Research preference");
+    const originalPrompt = "An original fictional short about an anonymous note left on a laundromat dryer.";
+    setPrompt(originalPrompt);
+    saveSetting(PROMPT_KEY, originalPrompt, "Prompt");
+    try {
+      const soundscape = createStorySoundscape();
+      prepareVideo(HUMAN_STORY_STARTER, soundscape, "original ambient score");
+    } catch (storyError) {
+      setMode("idle");
+      setError(`Could not compose the local story soundtrack: ${storyError.message}`);
+      setStatus("The story could not be prepared.");
+    }
+  }
+
   function prepareVideo(generatedVideo, audioBlob, voiceLabel, videoFormat = format) {
     const audioUrl = URL.createObjectURL(audioBlob);
     const audio = new Audio();
@@ -398,7 +714,7 @@ function DailyVideoStudio() {
     audio.addEventListener("error", () => {
       URL.revokeObjectURL(audioUrl);
       audioRef.current = null;
-      setError("The narration could not be decoded. Try a current Chrome or Edge browser.");
+      setError("The video's audio track could not be decoded. Try a current Chrome or Edge browser.");
       setMode("idle");
     }, { once: true });
     audio.addEventListener("loadedmetadata", () => {
@@ -460,8 +776,8 @@ function DailyVideoStudio() {
     }
     setVoiceFile(file);
     setError("");
-    if (storyDraft) {
-      attachUploadedVoice(storyDraft, file);
+    if (storyDraft || video) {
+      attachUploadedVoice(storyDraft || video, file);
     } else {
       setStatus(`${file.name} is ready. It stays on this device and will be added to your video locally.`);
     }
@@ -621,7 +937,9 @@ function DailyVideoStudio() {
     stopPreview();
     if (audioRef.current.currentTime >= video.duration) audioRef.current.currentTime = 0;
     setMode("playing");
-    setStatus("Playing the video with AI narration…");
+    setStatus(video.storyStyle === "laundromat-note"
+      ? "Playing the story film with its ambient soundtrack…"
+      : "Playing the video with AI narration…");
     let lastUpdate = 0;
     const tick = (now) => {
       const currentTime = audioRef.current?.currentTime || 0;
@@ -645,7 +963,7 @@ function DailyVideoStudio() {
       frameRef.current = requestAnimationFrame(tick);
     } catch (playError) {
       setMode("ready");
-      setStatus(`Could not play the narration: ${playError.message}`);
+      setStatus(`Could not play the video audio: ${playError.message}`);
     }
   }
 
@@ -674,7 +992,9 @@ function DailyVideoStudio() {
     }
     setError("");
     setMode("exporting");
-    setStatus("Rendering your narrated WebM locally. Keep this page open until the download starts.");
+    setStatus(video.storyStyle === "laundromat-note"
+      ? "Rendering your story film and ambient soundtrack locally. Keep this page open until the download starts."
+      : "Rendering your narrated WebM locally. Keep this page open until the download starts.");
     let audioContext;
     let mediaStream;
     let recorder;
@@ -876,12 +1196,16 @@ function DailyVideoStudio() {
               <div>
                 <span className="daily-step">02 · TYPE ONE PROMPT</span>
                 <h2 id="daily-prompt-title">Tell us what to make</h2>
-                <p>One clear sentence is enough. AI writes the video; choose who narrates it.</p>
+                <p>One clear sentence is enough. AI can write the video when configured, or build an original story film without an API key.</p>
               </div>
               <button className="daily-sample-button" type="button" onClick={() => {
                 setPrompt(category.prompt);
                 saveSetting(PROMPT_KEY, category.prompt, "Prompt");
               }} disabled={busy}>Use example prompt</button>
+            </div>
+            <div className="daily-offline-starter">
+              <div><strong>Want a more cinematic video without an API key?</strong><p>Build an original fictional story with custom scenes and an ambient soundtrack. Its narration script is ready for your real voice.</p></div>
+              <button className="daily-sample-button" type="button" onClick={loadHumanStoryStarter} disabled={busy}>Build story film</button>
             </div>
             <form onSubmit={generateVideo}>
               <label className="daily-prompt-label" htmlFor="daily-video-prompt">Your video prompt</label>
@@ -1058,14 +1382,14 @@ function DailyVideoStudio() {
                   />
                 </div>
                 <button className="daily-copy-button" type="button" onClick={playPreview} disabled={busy}>
-                  {mode === "playing" ? "Playing narration…" : "Preview with voice ▶"}
+                  {mode === "playing" ? "Playing audio…" : video.storyStyle === "laundromat-note" ? "Preview with soundtrack ▶" : "Preview with voice ▶"}
                 </button>
                 <p className="daily-video-meta">
                   {sceneIndex + 1} / {video.scenes.length} scenes · {formatDuration(video.duration)} · {format === "long" ? "16:9 landscape" : "9:16 vertical"}
                 </p>
               </div>
               <div className="daily-script-column">
-                <h3>Video narration</h3>
+                <h3>{video.storyStyle === "laundromat-note" ? "Voiceover script · record this in your own voice" : "Video narration"}</h3>
                 <div className="daily-script-text">{video.voiceover}</div>
                 <div className="daily-scenes" aria-label="Video storyboard">
                   {video.scenes.map((scene, index) => (
@@ -1086,7 +1410,11 @@ function DailyVideoStudio() {
                 ))}
               </div>
             )}
-            <p className="daily-footnote">The download happens only when you choose it. AI-generated facts and the finished video are yours to review before sharing.</p>
+            <p className="daily-footnote">
+              {video.storyStyle === "laundromat-note"
+                ? "This cut uses an original, locally composed ambient score instead of synthetic narration. The story is fiction; record the script in your own voice and upload it above for a human-narrated version."
+                : "The download happens only when you choose it. AI-generated facts and the finished video are yours to review before sharing."}
+            </p>
           </section>
         )}
       </main>

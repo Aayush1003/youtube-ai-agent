@@ -134,8 +134,9 @@ function buildDailyVideoPrompt(input) {
     `Create an engaging ${isLong ? "approximately five-minute, landscape YouTube video" : "60-second vertical YouTube Short"} for the ${category.label} category from this creator's prompt: "${input.prompt.trim()}".`,
     category.direction,
     "Write in clear, natural English unless the creator explicitly asks for another language. Begin with a concise hook, deliver the promised value or story, and end with a useful or memorable takeaway. Avoid filler, fake urgency, engagement bait, and promises of guaranteed results.",
+    "Make the viewer feel understood, not targeted: anchor the video in a recognizable question, need, decision, or small human moment. Build a clear beginning, a discovery or meaningful change, and a satisfying payoff. Let curiosity come from honest stakes and specific details, never fear, shame, or fake suspense.",
     `Return exactly ${sceneCount} sequential scenes. Every scene must have title (max 42 characters), caption (max 100 characters), setting (max 100 characters), and 2 or 3 visualLabels (each max 18 characters) suitable for clean animated graphics.`,
-    `The complete voiceover should be about ${wordRange}. Write naturally for speech, and keep scene captions aligned with the narration.`,
+    `The complete voiceover should be about ${wordRange}. Write naturally for speech, and keep scene captions aligned with the narration. Make each scene visually specific to its moment rather than repeating generic imagery.`,
     input.research
       ? "Use Google Search for relevant current context and factual claims; distinguish verified facts from ideas. Avoid making up evidence. Return only useful citations that informed the script."
       : "Do not depend on current web facts. Keep factual claims to reliable general knowledge and identify uncertainty rather than inventing details.",
@@ -569,7 +570,7 @@ function buildJavaShortPrompt(input) {
   return [
     `Create an accurate, engaging ${isLong ? "approximately five-minute, landscape YouTube lesson" : "60-second vertical YouTube Short"} about this Java concept: "${input.concept.trim()}".`,
     "Write the voiceover in natural Hinglish using Roman Hindi mixed with the standard English Java terms.",
-    `Return exactly ${sceneCount} scenes in a clear teaching sequence. Start with a hook, explain the core idea, include a worked Java example and important edge cases, and finish with a concise takeaway. Spread the explanation naturally across all scenes.`,
+    `Return exactly ${sceneCount} scenes in a clear teaching sequence. Start with a familiar coding question or moment of confusion, explain the core idea, include a worked Java example and important edge cases, and finish with a concise takeaway the learner can use. Spread the explanation naturally across all scenes.`,
     "Each scene needs a concise on-screen title (max 42 characters), caption (max 90 characters), and 2 or 3 short visualLabels (max 16 characters each).",
     `The complete voiceover should be about ${wordRange}, sound natural when spoken, and explain the same facts as the scenes.`,
     input.voiceSource === "upload"
