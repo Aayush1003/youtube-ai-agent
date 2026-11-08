@@ -1,8 +1,8 @@
 # Aayush Creator Lab
 
-A human-video discovery page featuring a small, hand-picked starting point of creator-uploaded films on YouTube. Choose a theme to filter the collection or search YouTube directly; video playback stays on YouTube, where creators host their work. The page also includes an Aayush Engineering Hub creator studio with engineering video ideas, outlines, publishing suggestions, and analytics observations. The built-in planner works without an API key; optionally, configure Google Gemini for AI-generated video-plan suggestions.
+Aayush Creator Lab is a human-reviewed YouTube creator planning and video-drafting studio. It helps creators shape a niche, test ideas, build a publishing rhythm, and generate original short-form and long-form video concepts without auto-publishing or growth tricks.
 
-The agent focuses on sustainable discovery and audience value. Generated videos aim to connect through recognizable human moments, useful ideas, and honest story payoffs—not fear, shame, or fake suspense. It does not buy views, automate engagement, publish to your channel, connect to YouTube Analytics, or promise a specific number of views or subscribers. Publishing and analytics suggestions are generated from the preferences and figures you provide and are not saved. Weekly reminder settings are stored in your browser only. A reminder requires notification permission and the app page to remain open; it is not a background service.
+The app focuses on sustainable discovery, audience value, and creator control. Generated ideas are meant to support thoughtful planning and honest storytelling, not fake performance promises or engagement bait.
 
 ## Requirements
 
@@ -22,7 +22,7 @@ Start the server:
 npm start
 ```
 
-Open <http://localhost:3000> and select **Build my first engineering video plan** or edit the prefilled channel brief and submit the form. Use **Open channel** to visit Aayush Engineering Hub on YouTube. Suggestions are generated on the server, and channel details and analytics figures are not saved.
+Open <http://localhost:3000> and select **Build my first engineering video plan** or edit the prefilled channel brief and submit the form. Use **Open channel** to visit Aayush Engineering Hub on YouTube.
 
 ### Optional: enable Gemini
 
@@ -35,17 +35,17 @@ npm start
 
 The key stays on the server and is never sent to the browser. When Gemini is enabled, channel details are sent to Google to generate the plan.
 
-The daily Java Short maker also requires Gemini text generation and TTS model access. Your draft and progress stay in your browser; generating a Short sends its Java concept and generated script to Google for script and voice generation. The narrated WebM is assembled in your browser and downloaded locally. API use may count toward your Gemini quota.
+The daily Java Short maker also requires Gemini text generation and TTS model access. Your draft and progress stay in your browser; generating a Short sends its Java concept and generated script to Google for audio generation.
 
-The separate Anime Story Studio at `/anime-studio` uses Gemini with Google Search grounding to research timely inspiration and return cited sources, then generates original anime-inspired storyboards and narration. It supports narrated vertical Shorts and landscape videos, AI or uploaded narration, local WebM export, and does not publish to YouTube. Search and story generation require `GEMINI_API_KEY` and access to Gemini Search grounding; AI narration additionally requires Gemini TTS access. The visual output is animated motion-manga graphics, not fully generated anime footage. Avoid existing characters and series; the studio prompts for original story worlds.
+The separate Anime Story Studio at `/anime-studio` uses Gemini with Google Search grounding to research timely inspiration and return cited sources, then generates original anime-inspired storyboards and narration.
 
-The **Daily Video Studio** at `/daily-video-studio` offers separate Gaming, Food, Education, Technology, Entertainment, and Storytelling categories. Choose one category, type one prompt, then generate a script and animated storyboard with optional web-grounded research and citations. Select a warm AI narrator or upload your own recording; uploaded audio stays in your browser and is combined with the animation locally. Short is selected by default; Long is also available. Download the finished WebM locally after reviewing it. Script generation requires `GEMINI_API_KEY` and Gemini Search grounding when research is enabled; AI narration additionally requires Gemini TTS access. Without an API key, **Build story film** creates the original six-scene fictional laundromat story with custom animation and a locally composed ambient score, without synthetic narration. Its voiceover script is ready for your own recording; upload the recording to render a human-narrated cut. The output uses animated graphics rather than generated gameplay footage. Your streak updates only after a successful download.
+The **Daily Video Studio** at `/daily-video-studio` offers separate Gaming, Food, Education, Technology, Entertainment, and Storytelling categories. Choose one category, type one prompt, then generate a short or long video concept with optional research and AI narration.
 
 ### Daily engineering drafts
 
-In the Daily Video Studio, enable **Daily engineering drafts** to generate one Hinglish engineering/programming/practical-AI script, storyboard, and AI narration for `@EngineerAayushGupta` at 9:00 AM Asia/Kolkata. Formats alternate between Short and long video. This recurring job is opt-in because it uses Gemini API quota and may incur charges. It requires `GEMINI_API_KEY` and the local server to remain running; if enabled after 9:00 AM, it prepares that day's draft immediately. Drafts are stored locally under the ignored `data/daily-video-drafts` directory and can be reopened in the studio.
+In the Daily Video Studio, enable **Daily engineering drafts** to generate one Hinglish engineering/programming/practical-AI script, storyboard, and AI narration for `@EngineerAayushGupta` at 9:00 AM Asia/Kolkata.
 
-The schedule does not render a finished WebM in the background or publish to YouTube. Open a saved draft in the studio to preview and download the browser-rendered video, then review it yourself. Automatic uploads are not enabled and require a separate Google OAuth/YouTube API integration.
+The schedule does not render a finished WebM in the background or publish to YouTube. Open a saved draft in the studio to preview and download the browser-rendered video, then review it yourself.
 
 To use another port, set `PORT` before starting the server.
 
@@ -57,9 +57,9 @@ To use another port, set `PORT` before starting the server.
 4. Select **Another idea** to request a fresh angle for the same channel brief whenever you need one.
 5. Use **Create a repeating rhythm** to see four weeks of your selected upload pattern. Optionally set a weekly reminder to work on your next upload.
 6. Enter figures for one video under **Review a video’s signals** to get directional prompts about click-through rate, retention, and subscriber conversion.
-7. Use **Your first animated DSA Short** to preview a 60-second HashMap explainer, copy its Hinglish voiceover, or export a silent vertical WebM video from a supported browser. Add your own narration and review the example before uploading; the app never publishes to your channel.
-8. Use **Make a Java Short from any concept** to get a rotating daily Java topic or enter your own. Choose a ~1-minute vertical Short or ~5-minute landscape video, and choose a generated AI voice or upload your own recording. The AI voice is guided to sound like a warm, sincere Hinglish mentor, with clear pronunciation and expressive but grounded delivery. Preview it, copy the Hinglish script, or download the narrated WebM locally. Uploaded audio stays on your device. Your draft, format, 7-day progress, and video-making streak stay in your browser and update only after a successful download. Script generation requires `GEMINI_API_KEY`; AI narration additionally requires Gemini speech generation access.
-9. Open **Anime Story Studio** as a separate page to research current story inspiration, pick from three original premises, choose narration and video format, review a storyboard, and download a narrated motion-manga WebM. Research sources are linked beside the ideas they inform. Search and AI generation require `GEMINI_API_KEY`; uploaded audio stays on your device.
-10. Open **Daily Video Studio** for Gaming, Food, Education, Technology, Entertainment, or Storytelling. Type one prompt, optionally research the web with citations, then choose AI narration or upload your own voice. Generate a Short or Long video, review it, and download locally.
+7. Use **Your first animated DSA Short** to preview a 60-second HashMap explainer, copy its Hinglish voiceover, or export a silent vertical WebM video from a supported browser. Add your own narration if needed.
+8. Use **Make a Java Short from any concept** to get a rotating daily Java topic or enter your own. Choose a ~1-minute vertical Short or ~5-minute landscape video, and choose a generated AI voice or upload your own.
+9. Open **Anime Story Studio** as a separate page to research current story inspiration, pick from three original premises, choose narration and video format, review a storyboard, and download a rendered preview.
+10. Open **Daily Video Studio** for Gaming, Food, Education, Technology, Entertainment, or Storytelling. Type one prompt, optionally research the web with citations, then choose AI narration or upload your own.
 
-The built-in planner uses reusable templates; Gemini can provide more tailored video-plan ideas when configured. The daily video maker sends the concept to Gemini to generate its script and voice track; set the key only on the server and review generated technical claims before uploading. Analytics observations use only the values entered and should be compared with your own channel baseline. No tool can guarantee views or subscribers.
+The built-in planner uses reusable templates; Gemini can provide more tailored video-plan ideas when configured. The daily video maker sends the concept to Gemini to generate its script and voice track, and it never posts to YouTube without your review.
