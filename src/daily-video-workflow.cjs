@@ -92,9 +92,32 @@ function calculateStreak(completedDates, today = localDateKey()) {
   return streak;
 }
 
+function buildLinkedInDraft(video) {
+  const category = DAILY_VIDEO_CATEGORIES.find((item) => item.id === video.category);
+  const format = video.format === "long" ? "long-form video" : "Short";
+  const sources = Array.isArray(video.sources)
+    ? video.sources
+        .filter((source) => typeof source?.url === "string" && source.url.trim())
+        .map((source) => `- ${source.title || source.url}: ${source.url}`)
+    : [];
+  return [
+    `I’m developing a ${category?.label || "video"} idea: “${video.title}”.`,
+    "",
+    video.logline,
+    "",
+    `I’m shaping this into a ${format} with one clear takeaway: [add the lesson or insight you want viewers to remember].`,
+    "",
+    "What example or question would make this more useful?",
+    ...(sources.length ? ["", "Sources to review:", ...sources] : []),
+    "",
+    "Before posting, add your own perspective and verify any factual claims.",
+  ].join("\n");
+}
+
 module.exports = {
   DAILY_VIDEO_CATEGORIES,
   HUMAN_STORY_STARTER,
+  buildLinkedInDraft,
   calculateStreak,
   dateOffset,
   localDateKey,

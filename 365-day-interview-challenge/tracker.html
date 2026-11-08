@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#101522">
+    <meta name="description" content="Track a sustainable 365-day software-engineering interview preparation challenge.">
+    <title>365-Day Interview Challenge · Progress Tracker</title>
+    <link rel="stylesheet" href="/365-day-challenge.css">
+    <script src="/365-day-challenge.js" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/">AAYUSH CREATOR LAB</a>
+      <a class="back-link" href="/365-day-challenge-guide">Challenge guide</a>
+    </header>
+    <main class="tracker-shell">
+      <section class="hero">
+        <div class="eyebrow">365 DAYS · YOUR PACE · YOUR PROGRESS</div>
+        <h1>Make progress <span>visible.</span></h1>
+        <p>One calm, practical place to plan interview practice, record what you learned, and come back to it later. Your tracker stays in this browser unless you export it.</p>
+        <div class="hero-controls">
+          <label for="start-date">Challenge start date</label>
+          <input id="start-date" type="date" value="2026-11-09">
+          <button id="export-csv" class="primary-button" type="button">Export for Excel / Sheets</button>
+        </div>
+      </section>
+
+      <section class="summary" aria-label="Challenge progress">
+        <article class="summary-card"><span>Days completed</span><strong id="completed-count">0 / 365</strong></article>
+        <article class="summary-card"><span>Completion</span><strong id="completion-rate">0%</strong></article>
+        <article class="summary-card"><span>Current day</span><strong id="current-day">Day 1</strong></article>
+        <p id="save-status" class="save-status" role="status" aria-live="polite">Changes save in this browser.</p>
+      </section>
+
+      <section class="tracker-panel" aria-labelledby="tracker-title">
+        <div class="panel-heading">
+          <div>
+            <div class="eyebrow">YOUR EDITABLE STUDY SHEET</div>
+            <h2 id="tracker-title">The 365-day tracker</h2>
+            <p>Edit the cells as you go. Use search and filters to find your next review.</p>
+          </div>
+          <button id="reset-progress" class="secondary-button" type="button">Clear saved progress</button>
+        </div>
+        <div class="table-tools">
+          <label class="search-label" for="search-days">Find a topic or note
+            <input id="search-days" type="search" placeholder="Try “trees” or “mock interview”">
+          </label>
+          <label class="filter-label" for="status-filter">Show
+            <select id="status-filter">
+              <option value="all">All days</option>
+              <option value="Not started">Not started</option>
+              <option value="In progress">In progress</option>
+              <option value="Done">Done</option>
+              <option value="Rest day">Rest day</option>
+            </select>
+          </label>
+        </div>
+        <div class="table-scroll" tabindex="0" aria-label="Scrollable 365-day tracker table">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Day / date</th>
+                <th scope="col">Focus</th>
+                <th scope="col">Status</th>
+                <th scope="col">Practice / prompt</th>
+                <th scope="col">What I learned</th>
+                <th scope="col">Confidence</th>
+                <th scope="col">Review date</th>
+              </tr>
+            </thead>
+            <tbody id="tracker-rows"></tbody>
+          </table>
+        </div>
+        <div class="pagination">
+          <button id="previous-page" class="secondary-button" type="button">← Previous</button>
+          <span id="page-label">Page 1 of 15</span>
+          <button id="next-page" class="secondary-button" type="button">Next →</button>
+        </div>
+        <p class="privacy-note">Autosaved on this device only. Export a CSV backup before clearing browser data. Taking a rest or catch-up day is part of a sustainable plan.</p>
+      </section>
+    </main>
+    <footer class="footer">A thoughtful practice log—not a guarantee of interview outcomes.</footer>
+  </body>
+</html>

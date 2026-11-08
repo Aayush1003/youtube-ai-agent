@@ -13,6 +13,14 @@ Aim for 60–90 minutes on most days; take rest or catch-up days when needed.
 
 A missed day is not a failure. Resume with the next planned session rather than trying to cram.
 
+## Interactive tracker
+
+Open the [365-day progress tracker](/365-day-challenge) in the app. It starts on **November 9, 2026** and lays out all 365 days through **November 8, 2027**. Change the start date if you are beginning later or want to reuse the plan.
+
+The tracker includes editable practice notes, learning reflections, confidence ratings, review dates, status filters, search, and progress totals. It autosaves in the current browser. Use **Export for Excel / Sheets** to download an Excel-compatible CSV backup; the app does not upload your notes. Import the CSV into Excel or Google Sheets to continue working with it there.
+
+Your progress is stored only in this browser. Export a backup before clearing site data or changing devices.
+
 ## Roadmap
 
 | Days | Focus | Suggested outcomes |
@@ -33,6 +41,27 @@ This is a sequence of themes, not a required problem list. Choose exercises that
 - **Day 5:** Mix topics and solve without looking at notes.
 - **Day 6:** Do a mock interview, design exercise, or behavioral practice.
 - **Day 7:** Review mistakes, plan the next week, or rest.
+
+## Momentum tracker
+
+A simple weekly scorecard to keep the challenge motivating instead of mechanical.
+
+Rate yourself from 1–5 for each category at the end of the week:
+
+| Category | What to look for | Score |
+| --- | --- | --- |
+| Problem solving | You understood the problem before coding and explained trade-offs. | 1–5 |
+| Communication | You could speak clearly, think aloud, and answer follow-ups. | 1–5 |
+| Confidence | You stayed calm, recovered from mistakes, and asked good clarifying questions. | 1–5 |
+| Improvement loop | You reviewed mistakes and turned them into a future habit. | 1–5 |
+
+Total score: out of 20.
+
+- 15–20: strong momentum; keep the same structure and stretch slightly.
+- 10–14: solid progress; focus on one weak area instead of trying to fix everything.
+- 0–9: reset and simplify; choose easier prompts and rebuild confidence before increasing difficulty.
+
+This keeps the challenge from becoming a numbers-only grind. Progress is not just count of problems solved; it is also how clearly you think, explain, and improve.
 
 ## Progress log
 

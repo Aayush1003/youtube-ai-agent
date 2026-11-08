@@ -31,6 +31,7 @@ const {
 const {
   DAILY_VIDEO_CATEGORIES,
   HUMAN_STORY_STARTER,
+  buildLinkedInDraft,
   calculateStreak: calculateDailyStreak,
 } = require("./src/daily-video-workflow.cjs");
 const {
@@ -45,6 +46,13 @@ const {
   calculateStreak,
   topicIndexForDate,
 } = require("./src/daily-java-workflow.cjs");
+const {
+  DEFAULT_START_DATE: INTERVIEW_CHALLENGE_START_DATE,
+  TOTAL_DAYS: INTERVIEW_CHALLENGE_DAYS,
+  createChallengeCsv,
+  createChallengeDays,
+  isValidDateKey: isValidInterviewDate,
+} = require("./365-day-interview-challenge/tracker.js");
 
 const input = {
   niche: "Home cooking",
@@ -110,6 +118,32 @@ test("counts only consecutive video-download days for the streak", () => {
   assert.equal(calculateStreak([], "2025-04-12"), 0);
 });
 
+test("creates a 365-day interview tracker from November 9, 2026", () => {
+  const days = createChallengeDays();
+  assert.equal(INTERVIEW_CHALLENGE_START_DATE, "2026-11-09");
+  assert.equal(INTERVIEW_CHALLENGE_DAYS, 365);
+  assert.equal(days.length, 365);
+  assert.equal(days[0].date, "2026-11-09");
+  assert.equal(days[364].date, "2027-11-08");
+  assert.equal(days[0].focus, "Foundations and baseline");
+  assert.equal(days[30].focus, "Core data structures");
+  assert.equal(isValidInterviewDate("2028-02-29"), true);
+  assert.equal(isValidInterviewDate("2027-02-29"), false);
+  assert.throws(() => createChallengeDays("2026-02-30"), /valid YYYY-MM-DD/);
+});
+
+test("exports an Excel-compatible CSV and neutralizes spreadsheet formulas", () => {
+  const days = createChallengeDays("2026-11-09");
+  days[0].practice = '=HYPERLINK("https://example.com","click")';
+  days[0].learned = 'I learned "trade-offs", safely.';
+  const csv = createChallengeCsv(days);
+  const lines = csv.split("\r\n");
+  assert.equal(lines.length, 366);
+  assert.match(lines[0], /"Day","Date","Focus"/);
+  assert.match(lines[1], /"'=HYPERLINK\(""https:\/\/example\.com"",""click""\)"/);
+  assert.match(lines[1], /"I learned ""trade-offs"", safely\."/);
+});
+
 test("provides an original offline Storytelling Short for cross-audience inspiration", () => {
   assert.equal(HUMAN_STORY_STARTER.category, "storytelling");
   assert.equal(HUMAN_STORY_STARTER.format, "short");
@@ -123,6 +157,26 @@ test("provides an original offline Storytelling Short for cross-audience inspira
   assert.ok(wordCount >= 100 && wordCount <= 125, `expected a Short-length script, got ${wordCount} words`);
   assert.match(HUMAN_STORY_STARTER.voiceover, /At midnight, someone left a note on Dryer Four/);
   assert.match(HUMAN_STORY_STARTER.voiceover, /No names\. No advice\./);
+});
+
+test("builds an editable LinkedIn companion without inventing personal experience", () => {
+  const draft = buildLinkedInDraft({
+    title: "HashMap Basics",
+    category: "education",
+    format: "short",
+    logline: "Explain how a hash map can make repeated lookups faster.",
+    sources: [{ title: "A data structures guide", url: "https://example.com/hashmaps" }],
+  });
+  assert.match(draft, /Education idea: “HashMap Basics”/);
+  assert.match(draft, /one clear takeaway: \[add the lesson or insight/);
+  assert.match(draft, /https:\/\/example\.com\/hashmaps/);
+  assert.match(draft, /add your own perspective and verify any factual claims/i);
+  assert.doesNotMatch(draft, /I learned|I struggled|I built/i);
+
+  const storyDraft = buildLinkedInDraft(HUMAN_STORY_STARTER);
+  assert.match(storyDraft, /Storytelling idea/);
+  assert.match(storyDraft, /Short/);
+  assert.doesNotMatch(storyDraft, /Sources to review/);
 });
 
 test("validates a Hinglish Java Short concept", () => {

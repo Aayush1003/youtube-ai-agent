@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import workflow from "./daily-video-workflow.cjs";
 
-const { DAILY_VIDEO_CATEGORIES, HUMAN_STORY_STARTER, calculateStreak, localDateKey } = workflow;
+const { DAILY_VIDEO_CATEGORIES, HUMAN_STORY_STARTER, buildLinkedInDraft, calculateStreak, localDateKey } = workflow;
 const CATEGORY_BY_ID = Object.fromEntries(DAILY_VIDEO_CATEGORIES.map((category) => [category.id, category]));
 const PROGRESS_KEY = "channelcraft.daily-video-progress";
 const PROMPT_KEY = "channelcraft.daily-video-prompt";
@@ -583,6 +583,7 @@ function DailyVideoStudio() {
   const [automationMessage, setAutomationMessage] = useState("");
   const [video, setVideo] = useState(null);
   const [storyDraft, setStoryDraft] = useState(null);
+  const [linkedinDraft, setLinkedinDraft] = useState("");
   const [voiceSource, setVoiceSource] = useState("ai");
   const [voiceFile, setVoiceFile] = useState(null);
   const [time, setTime] = useState(0);
@@ -639,6 +640,11 @@ function DailyVideoStudio() {
   useEffect(() => {
     if (video) drawAt(video, 0);
   }, [video]);
+
+  useEffect(() => {
+    const currentVideo = video || storyDraft;
+    if (currentVideo) setLinkedinDraft(buildLinkedInDraft(currentVideo));
+  }, [video, storyDraft]);
 
   useEffect(() => () => {
     if (frameRef.current) cancelAnimationFrame(frameRef.current);
@@ -1090,6 +1096,15 @@ function DailyVideoStudio() {
     }
   }
 
+  async function copyLinkedInDraft() {
+    try {
+      await navigator.clipboard.writeText(linkedinDraft);
+      setStatus("The LinkedIn draft was copied to your clipboard.");
+    } catch (copyError) {
+      setStatus(`Could not copy the LinkedIn draft: ${copyError.message}`);
+    }
+  }
+
   return (
     <>
       <header className="daily-topbar">
@@ -1415,6 +1430,29 @@ function DailyVideoStudio() {
                 ? "This cut uses an original, locally composed ambient score instead of synthetic narration. The story is fiction; record the script in your own voice and upload it above for a human-narrated version."
                 : "The download happens only when you choose it. AI-generated facts and the finished video are yours to review before sharing."}
             </p>
+          </section>
+        )}
+        {(video || storyDraft) && (
+          <section className="daily-linkedin-output" aria-labelledby="daily-linkedin-title">
+            <div className="daily-linkedin-heading">
+              <div>
+                <span className="daily-step">A COMPANION POST · HUMAN REVIEW</span>
+                <h2 id="daily-linkedin-title">Adapt this idea for LinkedIn</h2>
+                <p>Edit the draft to add your own experience and takeaway before sharing.</p>
+              </div>
+              <button className="daily-copy-button" type="button" onClick={copyLinkedInDraft} disabled={!linkedinDraft.trim()}>
+                Copy LinkedIn draft
+              </button>
+            </div>
+            <label className="daily-linkedin-label" htmlFor="daily-linkedin-draft">LinkedIn post draft</label>
+            <textarea
+              id="daily-linkedin-draft"
+              className="daily-linkedin-text"
+              value={linkedinDraft}
+              onChange={(event) => setLinkedinDraft(event.target.value)}
+              rows={9}
+            />
+            <p className="daily-footnote">This stays a draft in your browser. The app never publishes to LinkedIn.</p>
           </section>
         )}
       </main>

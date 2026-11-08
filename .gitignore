@@ -1,6 +1,23 @@
+# Dependencies
 /node_modules/
+
+# Local generated content
 /data/
+/daily/
+/downloads/
+
+# Browser-rendered video exports and local media artifacts
+*.webm
+*.mp4
+*.mov
+*.mkv
+*.avi
+*.m4v
+*.mp3
+*.wav
+*.aac
+
+# Build outputs
 /short-studio.bundle.js
 /anime-studio.bundle.js
 /daily-video-studio.bundle.js
-/daily
