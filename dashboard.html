@@ -1,0 +1,964 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0d1127">
+    <title>Aayush Engineering Hub — Channel Growth Command Center</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=Manrope:wght@500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        --bg-deep: #0a0d1e;
+        --bg-card: #121735;
+        --bg-card-hover: #181f45;
+        --line: rgba(255, 255, 255, 0.08);
+        --line-active: rgba(124, 104, 255, 0.4);
+        --text: #f0f1fa;
+        --text-muted: #959bb8;
+        --teal: #36e1d2;
+        --teal-glow: rgba(54, 225, 210, 0.25);
+        --purple: #7c68ff;
+        --purple-glow: rgba(124, 104, 255, 0.3);
+        --lavender: #c7b9ff;
+        --amber: #fca311;
+        --rose: #ff5c77;
+        font-family: 'DM Sans', sans-serif;
+      }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        background: radial-gradient(circle at 10% 15%, #181c42 0%, var(--bg-deep) 45%),
+                    radial-gradient(circle at 90% 80%, #221a47 0%, var(--bg-deep) 55%);
+        background-color: var(--bg-deep);
+        color: var(--text);
+        min-height: 100vh;
+        line-height: 1.5;
+        padding-bottom: 60px;
+      }
+      .nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 5%;
+        border-bottom: 1px solid var(--line);
+        background: rgba(10, 13, 30, 0.85);
+        backdrop-filter: blur(14px);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none;
+        color: var(--text);
+      }
+      .brand-badge {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, var(--teal), var(--purple));
+        display: grid;
+        place-items: center;
+        font-family: 'Manrope', sans-serif;
+        font-weight: 800;
+        font-size: 18px;
+        color: #080a18;
+      }
+      .brand-title {
+        font-family: 'Manrope', sans-serif;
+        font-size: 16px;
+        font-weight: 800;
+        letter-spacing: -0.3px;
+      }
+      .brand-sub {
+        font-size: 11px;
+        color: var(--text-muted);
+        display: block;
+      }
+      .nav-links {
+        display: flex;
+        gap: 14px;
+        align-items: center;
+      }
+      .nav-link {
+        font-size: 13px;
+        color: var(--text-muted);
+        text-decoration: none;
+        padding: 6px 12px;
+        border-radius: 8px;
+        transition: 0.15s ease;
+      }
+      .nav-link:hover {
+        color: var(--text);
+        background: rgba(255, 255, 255, 0.05);
+      }
+      .nav-btn {
+        background: linear-gradient(135deg, var(--teal), #23b7a8);
+        color: #060914;
+        font-weight: 700;
+        padding: 7px 16px;
+        border-radius: 8px;
+        font-size: 13px;
+        text-decoration: none;
+      }
+      .main {
+        max-width: 1240px;
+        margin: 0 auto;
+        padding: 36px 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 36px;
+      }
+      .hero {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .hero-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--teal);
+      }
+      .hero-tag .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--teal);
+        box-shadow: 0 0 10px var(--teal);
+      }
+      .hero h1 {
+        font-family: 'Manrope', sans-serif;
+        font-size: clamp(28px, 4vw, 42px);
+        font-weight: 800;
+        letter-spacing: -1px;
+      }
+      .hero h1 span {
+        background: linear-gradient(90deg, var(--teal), var(--lavender));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .hero p {
+        color: var(--text-muted);
+        font-size: 15px;
+        max-width: 680px;
+      }
+
+      /* KPI Cards */
+      .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 16px;
+      }
+      .kpi-card {
+        background: var(--bg-card);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 22px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        transition: transform 0.2s, border-color 0.2s;
+      }
+      .kpi-card:hover {
+        transform: translateY(-2px);
+        border-color: var(--line-active);
+      }
+      .kpi-label {
+        font-size: 12px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        font-weight: 600;
+      }
+      .kpi-value {
+        font-family: 'Manrope', sans-serif;
+        font-size: 34px;
+        font-weight: 800;
+        color: var(--text);
+      }
+      .kpi-change {
+        font-size: 12px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .positive { color: var(--teal); }
+
+      /* Content Pillars */
+      .section-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 16px;
+      }
+      .section-head h2 {
+        font-family: 'Manrope', sans-serif;
+        font-size: 22px;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+      }
+      .section-head p {
+        font-size: 13px;
+        color: var(--text-muted);
+      }
+      .pillar-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+        gap: 18px;
+      }
+      .pillar-card {
+        background: var(--bg-card);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        position: relative;
+        overflow: hidden;
+      }
+      .pillar-card:hover {
+        background: var(--bg-card-hover);
+        border-color: var(--line-active);
+      }
+      .pillar-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .pillar-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        font-size: 20px;
+      }
+      .pillar-dsa .pillar-icon { background: rgba(54, 225, 210, 0.15); color: var(--teal); }
+      .pillar-sys .pillar-icon { background: rgba(124, 104, 255, 0.15); color: var(--purple); }
+      .pillar-ai .pillar-icon { background: rgba(252, 163, 17, 0.15); color: var(--amber); }
+      .pillar-prep .pillar-icon { background: rgba(255, 92, 119, 0.15); color: var(--rose); }
+
+      .pillar-tag {
+        font-size: 11px;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 20px;
+        letter-spacing: 0.5px;
+      }
+      .pillar-dsa .pillar-tag { background: rgba(54, 225, 210, 0.15); color: var(--teal); }
+      .pillar-sys .pillar-tag { background: rgba(124, 104, 255, 0.15); color: var(--purple); }
+      .pillar-ai .pillar-tag { background: rgba(252, 163, 17, 0.15); color: var(--amber); }
+      .pillar-prep .pillar-tag { background: rgba(255, 92, 119, 0.15); color: var(--rose); }
+
+      .pillar-title {
+        font-family: 'Manrope', sans-serif;
+        font-size: 18px;
+        font-weight: 700;
+      }
+      .pillar-desc {
+        color: var(--text-muted);
+        font-size: 13px;
+        line-height: 1.5;
+      }
+      .pillar-topics {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-top: 4px;
+        border-top: 1px solid var(--line);
+        padding-top: 12px;
+      }
+      .pillar-topics li {
+        font-size: 12px;
+        color: var(--lavender);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .pillar-topics li::before {
+        content: "▹";
+        color: var(--teal);
+      }
+
+      /* Charts & Trajectory */
+      .charts-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 20px;
+      }
+      @media (max-width: 900px) {
+        .charts-grid { grid-template-columns: 1fr; }
+      }
+      .chart-panel {
+        background: var(--bg-card);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+      .canvas-wrap {
+        position: relative;
+        width: 100%;
+        height: 300px;
+      }
+      canvas {
+        width: 100% !important;
+        height: 100% !important;
+        display: block;
+      }
+
+      /* Interactive Video Idea Generator */
+      .idea-box {
+        background: linear-gradient(135deg, rgba(30, 24, 66, 0.6), rgba(18, 23, 53, 0.9));
+        border: 1px solid var(--line-active);
+        border-radius: 18px;
+        padding: 30px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      }
+      .idea-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      .idea-badge {
+        background: rgba(54, 225, 210, 0.15);
+        color: var(--teal);
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+      }
+      .gen-btn {
+        background: linear-gradient(135deg, var(--teal), var(--purple));
+        border: none;
+        color: #070a1a;
+        font-weight: 800;
+        font-size: 14px;
+        padding: 10px 22px;
+        border-radius: 10px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: transform 0.15s, box-shadow 0.15s;
+      }
+      .gen-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 18px var(--teal-glow);
+      }
+      .idea-content {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 24px;
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 24px;
+      }
+      @media (max-width: 768px) {
+        .idea-content { grid-template-columns: 1fr; }
+      }
+      .idea-main h3 {
+        font-family: 'Manrope', sans-serif;
+        font-size: 22px;
+        font-weight: 800;
+        margin-bottom: 8px;
+        color: #ffffff;
+      }
+      .idea-hook {
+        font-style: italic;
+        color: var(--lavender);
+        font-size: 14px;
+        margin-bottom: 14px;
+        border-left: 3px solid var(--teal);
+        padding-left: 12px;
+      }
+      .idea-beats {
+        list-style: decimal;
+        padding-left: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        font-size: 13px;
+        color: var(--text-muted);
+      }
+      .idea-side {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        border-left: 1px solid var(--line);
+        padding-left: 20px;
+      }
+      @media (max-width: 768px) {
+        .idea-side { border-left: none; padding-left: 0; border-top: 1px solid var(--line); padding-top: 16px; }
+      }
+      .meta-item h4 {
+        font-size: 11px;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        margin-bottom: 4px;
+      }
+      .meta-item p {
+        font-size: 13px;
+        color: var(--text);
+      }
+
+      /* 90-Day Content Calendar */
+      .calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 14px;
+      }
+      .cal-card {
+        background: var(--bg-card);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .cal-week {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--text-muted);
+      }
+      .cal-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        padding: 6px 10px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.04);
+      }
+      .cal-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .cal-dot.dsa { background: var(--teal); box-shadow: 0 0 6px var(--teal); }
+      .cal-dot.sys { background: var(--purple); box-shadow: 0 0 6px var(--purple); }
+      .cal-dot.ai { background: var(--amber); box-shadow: 0 0 6px var(--amber); }
+      .cal-dot.prep { background: var(--rose); box-shadow: 0 0 6px var(--rose); }
+
+      .footer {
+        text-align: center;
+        padding: 24px;
+        font-size: 12px;
+        color: var(--text-muted);
+      }
+    </style>
+  </head>
+  <body>
+    <header class="nav">
+      <a class="brand" href="/">
+        <div class="brand-badge">AG</div>
+        <div>
+          <span class="brand-title">Aayush Engineering Hub</span>
+          <span class="brand-sub">@AayushGupta04</span>
+        </div>
+      </a>
+      <div class="nav-links">
+        <a class="nav-link" href="/">Video Studio</a>
+        <a class="nav-link" href="/365-day-challenge">365-Day Challenge</a>
+        <a class="nav-btn" href="https://www.youtube.com/@AayushGupta04" target="_blank" rel="noopener">Open Channel ↗</a>
+      </div>
+    </header>
+
+    <main class="main">
+      <section class="hero">
+        <div class="hero-tag">
+          <span class="dot"></span>
+          Channel Growth Command Center
+        </div>
+        <h1>Data-Driven Strategy for <span>Aayush Gupta</span></h1>
+        <p>Real-time visual roadmap, algorithmic growth trajectory, and automated video blueprints designed specifically for DSA, System Design, and AI tutorials.</p>
+      </section>
+
+      <!-- KPI Summary -->
+      <section class="kpi-grid">
+        <div class="kpi-card">
+          <span class="kpi-label">Core Content Pillars</span>
+          <span class="kpi-value">4</span>
+          <span class="kpi-change positive">● DSA, System Design, AI, Prep</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-label">Target Consistency</span>
+          <span class="kpi-value">3 / wk</span>
+          <span class="kpi-change positive">↑ 2 Shorts + 1 Long-form</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-label">Target Avg CTR</span>
+          <span class="kpi-value">7.8%</span>
+          <span class="kpi-change positive">↑ High-contrast tech cards</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-label">Target Avg Retention</span>
+          <span class="kpi-value">62%</span>
+          <span class="kpi-change positive">↑ Fast 3-second animated hooks</span>
+        </div>
+      </section>
+
+      <!-- Content Pillar Matrix -->
+      <section>
+        <div class="section-head">
+          <div>
+            <h2>Core Content Pillars</h2>
+            <p>Your strategic niche distribution balancing searchable evergreens and viral Shorts</p>
+          </div>
+        </div>
+        <div class="pillar-grid">
+          <div class="pillar-card pillar-dsa">
+            <div class="pillar-header">
+              <div class="pillar-icon">⚡</div>
+              <span class="pillar-tag">40% SHARE</span>
+            </div>
+            <h3 class="pillar-title">DSA & LeetCode Mastery</h3>
+            <p class="pillar-desc">Animated algorithmic insights (e.g. Two Pointers, Sliding Window, DP) showing visual complexity shifts $O(n^2) \to O(n)$.</p>
+            <ul class="pillar-topics">
+              <li>Two Pointers & Sliding Window</li>
+              <li>Binary Search Variants</li>
+              <li>Dynamic Programming Patterns</li>
+              <li>Graph Traversal & Shortest Path</li>
+            </ul>
+          </div>
+
+          <div class="pillar-card pillar-sys">
+            <div class="pillar-header">
+              <div class="pillar-icon">🏛️</div>
+              <span class="pillar-tag">25% SHARE</span>
+            </div>
+            <h3 class="pillar-title">System Design Architecture</h3>
+            <p class="pillar-desc">Real-world production engineering breakdowns for modern distributed backends, databases, and microservices.</p>
+            <ul class="pillar-topics">
+              <li>URL Shortener & Rate Limiter</li>
+              <li>Distributed Cache (Redis/Memcached)</li>
+              <li>Real-time Chat with WebSockets</li>
+              <li>CDN & Video Streaming Backend</li>
+            </ul>
+          </div>
+
+          <div class="pillar-card pillar-ai">
+            <div class="pillar-header">
+              <div class="pillar-icon">🤖</div>
+              <span class="pillar-tag">20% SHARE</span>
+            </div>
+            <h3 class="pillar-title">Modern AI & LLMs Decoded</h3>
+            <p class="pillar-desc">Visual and hands-on tutorials explaining how generative AI, embeddings, transformers, and agentic workflows operate.</p>
+            <ul class="pillar-topics">
+              <li>How Transformers Attention Works</li>
+              <li>Building Local RAG with Python</li>
+              <li>Gemini & Claude Function Calling</li>
+              <li>Vector Databases in 10 Minutes</li>
+            </ul>
+          </div>
+
+          <div class="pillar-card pillar-prep">
+            <div class="pillar-header">
+              <div class="pillar-icon">💼</div>
+              <span class="pillar-tag">15% SHARE</span>
+            </div>
+            <h3 class="pillar-title">FAANG & Tech Interview Strategy</h3>
+            <p class="pillar-desc">Mock interview walkthroughs, resume teardowns, and behavioral frameworks (STAR method) to maximize offer conversion.</p>
+            <ul class="pillar-topics">
+              <li>Live Coding Mock Round Breakdown</li>
+              <li>System Design Interview Framework</li>
+              <li>Behavioral Questions That Fail People</li>
+              <li>Offer Negotiation Tactics</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Charts Section -->
+      <section class="charts-grid">
+        <div class="chart-panel">
+          <div class="section-head">
+            <div>
+              <h2>12-Month Audience Trajectory</h2>
+              <p>Projected milestone growth based on 3 high-retention uploads weekly</p>
+            </div>
+          </div>
+          <div class="canvas-wrap">
+            <canvas id="growthChart" aria-label="Audience growth trajectory chart"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-panel">
+          <div class="section-head">
+            <div>
+              <h2>Niche Positioning Radar</h2>
+              <p>Aayush Engineering Hub vs Generic Tech Channel</p>
+            </div>
+          </div>
+          <div class="canvas-wrap">
+            <canvas id="radarChart" aria-label="Competitive positioning radar chart"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- Instant Video Idea Generator -->
+      <section class="idea-box">
+        <div class="idea-header">
+          <div>
+            <span class="idea-badge">AI CONTENT LAB</span>
+            <h2 style="font-family:'Manrope',sans-serif; margin-top:6px;">Next High-Impact Video Blueprint</h2>
+          </div>
+          <button class="gen-btn" id="genBtn" type="button">
+            <span>Generate Next Idea</span> ↻
+          </button>
+        </div>
+
+        <div class="idea-content">
+          <div class="idea-main">
+            <h3 id="ideaTitle">Two Pointers Pattern: Solve 80% of Array Problems in O(n)</h3>
+            <div class="idea-hook" id="ideaHook">"Stop writing nested for-loops for array search. In the next 60 seconds, here's how moving two pointers cuts your time complexity from quadratic to linear."</div>
+            <ol class="idea-beats" id="ideaBeats">
+              <li>Visual contrast: nested loop $O(n^2)$ lagging vs two pointers $O(n)$ traversing in single pass.</li>
+              <li>The rule: Array must be sorted (or sortable).</li>
+              <li>Left pointer at index 0, right pointer at n-1.</li>
+              <li>Step through sum comparison: if sum &lt; target, move left; if &gt;, move right.</li>
+              <li>Takeaway exercise for viewers to comment their code solution.</li>
+            </ol>
+          </div>
+          <div class="idea-side">
+            <div class="meta-item">
+              <h4>Format</h4>
+              <p id="ideaFormat">9:16 Short (45s) or 8m Deep Dive</p>
+            </div>
+            <div class="meta-item">
+              <h4>Thumbnail Concept</h4>
+              <p id="ideaThumb">Split screen: Red cross on nested for-loop vs glowing green Two Pointer arrows with text: "O(n) TRICK".</p>
+            </div>
+            <div class="meta-item">
+              <h4>Keywords</h4>
+              <p id="ideaKeywords">Two Pointers LeetCode, DSA Interview, Two Sum Python, Array Patterns</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 90-Day Content Calendar -->
+      <section>
+        <div class="section-head">
+          <div>
+            <h2>90-Day Upload Schedule (Weeks 1 to 12)</h2>
+            <p>Consistent 3x/week publishing cadence alternating high-velocity Shorts and pillar Long-forms</p>
+          </div>
+        </div>
+        <div class="calendar-grid" id="calendarGrid"></div>
+      </section>
+
+      <footer class="footer">
+        Built specifically for Aayush Engineering Hub (@AayushGupta04) · ChannelCraft Engine
+      </footer>
+    </main>
+
+    <script>
+      // Growth Trajectory Canvas Chart
+      const growthCanvas = document.getElementById('growthChart');
+      if (growthCanvas) {
+        const ctx = growthCanvas.getContext('2d');
+        function resizeCanvas() {
+          const rect = growthCanvas.getBoundingClientRect();
+          growthCanvas.width = rect.width * window.devicePixelRatio;
+          growthCanvas.height = rect.height * window.devicePixelRatio;
+          ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+          drawGrowthChart(rect.width, rect.height);
+        }
+        
+        function drawGrowthChart(width, height) {
+          ctx.clearRect(0, 0, width, height);
+          const padding = { top: 20, right: 30, bottom: 40, left: 55 };
+          const chartW = width - padding.left - padding.right;
+          const chartH = height - padding.top - padding.bottom;
+          
+          const months = ['M1', 'M2', 'M3', 'M4', 'M5', 'M6', 'M7', 'M8', 'M9', 'M10', 'M11', 'M12'];
+          const data = [250, 600, 1200, 2100, 3400, 5200, 7500, 10500, 14200, 18900, 24500, 31000];
+          const maxVal = 35000;
+
+          // Grid lines
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
+          ctx.lineWidth = 1;
+          for (let i = 0; i <= 4; i++) {
+            const y = padding.top + (chartH / 4) * i;
+            ctx.beginPath();
+            ctx.moveTo(padding.left, y);
+            ctx.lineTo(padding.left + chartW, y);
+            ctx.stroke();
+
+            ctx.fillStyle = '#676d8a';
+            ctx.font = '10px DM Sans';
+            ctx.textAlign = 'right';
+            const val = Math.round((maxVal - (maxVal / 4) * i) / 1000) + 'k';
+            ctx.fillText(val, padding.left - 8, y + 4);
+          }
+
+          // X axis labels
+          ctx.textAlign = 'center';
+          months.forEach((m, idx) => {
+            const x = padding.left + (chartW / (months.length - 1)) * idx;
+            ctx.fillText(m, x, height - 15);
+          });
+
+          // Curve line with glow
+          ctx.beginPath();
+          data.forEach((val, idx) => {
+            const x = padding.left + (chartW / (data.length - 1)) * idx;
+            const y = padding.top + chartH - (val / maxVal) * chartH;
+            if (idx === 0) ctx.moveTo(x, y);
+            else {
+              const prevX = padding.left + (chartW / (data.length - 1)) * (idx - 1);
+              const prevY = padding.top + chartH - (data[idx - 1] / maxVal) * chartH;
+              const cpX = (prevX + x) / 2;
+              ctx.bezierCurveTo(cpX, prevY, cpX, y, x, y);
+            }
+          });
+
+          ctx.strokeStyle = '#36e1d2';
+          ctx.lineWidth = 3;
+          ctx.shadowColor = 'rgba(54, 225, 210, 0.5)';
+          ctx.shadowBlur = 12;
+          ctx.stroke();
+          ctx.shadowBlur = 0;
+
+          // Milestone markers
+          const milestones = [
+            { idx: 2, label: '1K Subs' },
+            { idx: 6, label: '7.5K' },
+            { idx: 11, label: '30K+' }
+          ];
+          milestones.forEach(m => {
+            const x = padding.left + (chartW / (data.length - 1)) * m.idx;
+            const y = padding.top + chartH - (data[m.idx] / maxVal) * chartH;
+            ctx.fillStyle = '#7c68ff';
+            ctx.beginPath();
+            ctx.arc(x, y, 5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#f0f1fa';
+            ctx.font = 'bold 10px DM Sans';
+            ctx.fillText(m.label, x, y - 10);
+          });
+        }
+        window.addEventListener('resize', resizeCanvas);
+        setTimeout(resizeCanvas, 50);
+      }
+
+      // Niche Positioning Radar Chart
+      const radarCanvas = document.getElementById('radarChart');
+      if (radarCanvas) {
+        const ctx = radarCanvas.getContext('2d');
+        function resizeRadar() {
+          const rect = radarCanvas.getBoundingClientRect();
+          radarCanvas.width = rect.width * window.devicePixelRatio;
+          radarCanvas.height = rect.height * window.devicePixelRatio;
+          ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+          drawRadar(rect.width, rect.height);
+        }
+        function drawRadar(width, height) {
+          ctx.clearRect(0, 0, width, height);
+          const cx = width / 2;
+          const cy = height / 2;
+          const radius = Math.min(width, height) * 0.35;
+          const axes = ['Depth', 'Visuals', 'Retention', 'SEO Focus', 'Code Clarity'];
+          const yourScores = [0.95, 0.90, 0.85, 0.80, 0.95];
+          const avgScores = [0.55, 0.45, 0.50, 0.60, 0.50];
+
+          // Polygon rings
+          for (let r = 1; r <= 3; r++) {
+            ctx.beginPath();
+            for (let i = 0; i < axes.length; i++) {
+              const angle = (Math.PI * 2 / axes.length) * i - Math.PI / 2;
+              const x = cx + Math.cos(angle) * (radius * (r / 3));
+              const y = cy + Math.sin(angle) * (radius * (r / 3));
+              if (i === 0) ctx.moveTo(x, y);
+              else ctx.lineTo(x, y);
+            }
+            ctx.closePath();
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+            ctx.stroke();
+          }
+
+          // Spoke lines & labels
+          axes.forEach((axis, idx) => {
+            const angle = (Math.PI * 2 / axes.length) * idx - Math.PI / 2;
+            const x = cx + Math.cos(angle) * radius;
+            const y = cy + Math.sin(angle) * radius;
+            ctx.beginPath();
+            ctx.moveTo(cx, cy);
+            ctx.lineTo(x, y);
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+            ctx.stroke();
+
+            const lx = cx + Math.cos(angle) * (radius + 20);
+            const ly = cy + Math.sin(angle) * (radius + 20);
+            ctx.fillStyle = '#959bb8';
+            ctx.font = '10px DM Sans';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(axis, lx, ly);
+          });
+
+          // Draw Average
+          drawPoly(avgScores, 'rgba(149, 155, 184, 0.25)', 'rgba(149, 155, 184, 0.6)');
+          // Draw Aayush Hub
+          drawPoly(yourScores, 'rgba(54, 225, 210, 0.25)', '#36e1d2');
+
+          function drawPoly(scores, fillStyle, strokeStyle) {
+            ctx.beginPath();
+            scores.forEach((s, idx) => {
+              const angle = (Math.PI * 2 / scores.length) * idx - Math.PI / 2;
+              const x = cx + Math.cos(angle) * (radius * s);
+              const y = cy + Math.sin(angle) * (radius * s);
+              if (idx === 0) ctx.moveTo(x, y);
+              else ctx.lineTo(x, y);
+            });
+            ctx.closePath();
+            ctx.fillStyle = fillStyle;
+            ctx.fill();
+            ctx.strokeStyle = strokeStyle;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+          }
+        }
+        window.addEventListener('resize', resizeRadar);
+        setTimeout(resizeRadar, 50);
+      }
+
+      // Idea Generator Data
+      const ideas = [
+        {
+          title: "Two Pointers Pattern: Solve 80% of Array Problems in O(n)",
+          hook: "Stop writing nested for-loops for array search. In the next 60 seconds, here's how moving two pointers cuts your time complexity from quadratic to linear.",
+          beats: [
+            "Visual contrast: nested loop O(n²) lagging vs two pointers O(n) traversing.",
+            "The rule: Array must be sorted (or sortable).",
+            "Left pointer at index 0, right pointer at n-1.",
+            "Step through sum comparison: if sum < target, move left; if >, move right.",
+            "Takeaway challenge: test your knowledge in the comments."
+          ],
+          format: "9:16 Short (45s) or 8m Deep Dive",
+          thumb: "Split screen: Red cross on nested for-loop vs glowing green Two Pointer arrows with text: 'O(n) TRICK'.",
+          keywords: "Two Pointers LeetCode, DSA Interview, Two Sum Python, Array Patterns"
+        },
+        {
+          title: "Design a Distributed Rate Limiter: Token Bucket vs Leaky Bucket",
+          hook: "How does Twitter prevent 10,000 bots from taking down their API with a single bash script? They use a Token Bucket rate limiter.",
+          beats: [
+            "Real problem: DDoS and API abuse on free tier endpoints.",
+            "Walkthrough: Redis sliding window log vs token bucket memory consumption.",
+            "Implementation: 20 lines of Python code using Redis INCR and EXPIRE.",
+            "Edge cases: Distributed race conditions and clock synchronization.",
+            "Summary recap for your next System Design round."
+          ],
+          format: "Long-form (12-15 minutes)",
+          thumb: "Glowing neon Redis shield blocking a wave of red bot requests. Text: 'SYSTEM DESIGN: RATE LIMITER'.",
+          keywords: "System Design Interview, Rate Limiter Redis, Token Bucket Algorithm, Backend Engineering"
+        },
+        {
+          title: "How Attention Works in Transformers: Explained with 0 Fluff",
+          hook: "Every modern AI from ChatGPT to Claude relies on one single formula: Softmax(Q K transpose over root d) times V. Here is what that actually means visually.",
+          beats: [
+            "Query, Key, and Value visualized like a database lookup.",
+            "Dot product calculation measuring contextual similarity.",
+            "Softmax normalization turning weights into probabilities.",
+            "Weighted sum combining all token meanings.",
+            "Why this enables massive parallel GPU training unlike RNNs."
+          ],
+          format: "Long-form (10-14 minutes)",
+          thumb: "Matrix dot product diagram glowing in purple and gold. Text: 'ATTENTION MECHANISM VISUALIZED'.",
+          keywords: "Transformer Architecture, Self Attention Explained, Deep Learning NLP, LLM Internals"
+        },
+        {
+          title: "Sliding Window Maximum in O(n): Monotonic Deque Explained",
+          hook: "If LeetCode 239 is haunting your interview prep, here is the secret: a Monotonic Deque keeps track of the maximum without ever re-scanning.",
+          beats: [
+            "Naive approach O(n*k) and why it fails on big inputs.",
+            "What is a Monotonic Deque? Keeping elements strictly descending.",
+            "Visualizing the window slide: popping expired indices from the front.",
+            "Popping smaller elements from the back before inserting.",
+            "Final O(n) complexity proof."
+          ],
+          format: "9:16 Short (60s) + Code walkthrough",
+          thumb: "Green sliding rectangle scanning an array with peak element highlighted. Text: 'HARD LEETCODE SOLVED'.",
+          keywords: "Sliding Window Maximum, LeetCode Hard, Monotonic Queue, Java DSA"
+        }
+      ];
+
+      let ideaIdx = 0;
+      const genBtn = document.getElementById('genBtn');
+      if (genBtn) {
+        genBtn.addEventListener('click', () => {
+          ideaIdx = (ideaIdx + 1) % ideas.length;
+          const cur = ideas[ideaIdx];
+          document.getElementById('ideaTitle').textContent = cur.title;
+          document.getElementById('ideaHook').textContent = '"' + cur.hook + '"';
+          const beatsEl = document.getElementById('ideaBeats');
+          beatsEl.innerHTML = cur.beats.map(b => '<li>' + b + '</li>').join('');
+          document.getElementById('ideaFormat').textContent = cur.format;
+          document.getElementById('ideaThumb').textContent = cur.thumb;
+          document.getElementById('ideaKeywords').textContent = cur.keywords;
+        });
+      }
+
+      // 90-Day Calendar Population
+      const calGrid = document.getElementById('calendarGrid');
+      if (calGrid) {
+        const schedule = [
+          { week: 1, items: [{ type: 'dsa', text: 'Short: Two Pointers Basics' }, { type: 'sys', text: 'Video: URL Shortener Architecture' }, { type: 'ai', text: 'Short: Tokenizer in 60s' }] },
+          { week: 2, items: [{ type: 'dsa', text: 'Video: Sliding Window Mastery' }, { type: 'prep', text: 'Short: Top 5 LeetCode Traps' }, { type: 'sys', text: 'Short: Redis Caching Pattern' }] },
+          { week: 3, items: [{ type: 'ai', text: 'Video: RAG with Python & Chroma' }, { type: 'dsa', text: 'Short: Binary Search Bounds' }, { type: 'prep', text: 'Video: Mock Coding Interview' }] },
+          { week: 4, items: [{ type: 'sys', text: 'Video: Rate Limiter System Design' }, { type: 'dsa', text: 'Short: Fast & Slow Pointers' }, { type: 'ai', text: 'Short: Embeddings Explained' }] },
+          { week: 5, items: [{ type: 'dsa', text: 'Video: DP 0/1 Knapsack Pattern' }, { type: 'prep', text: 'Short: Resume Project Tips' }, { type: 'sys', text: 'Short: SQL vs NoSQL Decisions' }] },
+          { week: 6, items: [{ type: 'ai', text: 'Video: Attention Mechanism Visualized' }, { type: 'dsa', text: 'Short: Inverting a Binary Tree' }, { type: 'sys', text: 'Video: Notification Service Design' }] },
+          { week: 7, items: [{ type: 'dsa', text: 'Video: Graph BFS & DFS Traversal' }, { type: 'prep', text: 'Short: STAR Method Answers' }, { type: 'ai', text: 'Short: Temperature & Top-P' }] },
+          { week: 8, items: [{ type: 'sys', text: 'Video: Distributed Id Generator' }, { type: 'dsa', text: 'Short: Merge Intervals Trick' }, { type: 'prep', text: 'Video: System Design Interview Guide' }] },
+          { week: 9, items: [{ type: 'ai', text: 'Video: AI Agents with Function Calling' }, { type: 'dsa', text: 'Short: Monotonic Stack in 60s' }, { type: 'sys', text: 'Short: Message Queues (Kafka)' }] },
+          { week: 10, items: [{ type: 'dsa', text: 'Video: Dijkstra Shortest Path' }, { type: 'prep', text: 'Short: Questions to Ask Interviewer' }, { type: 'ai', text: 'Short: Vector Search Cosine Similarity' }] },
+          { week: 11, items: [{ type: 'sys', text: 'Video: Real-Time Chat Architecture' }, { type: 'dsa', text: 'Short: Top K Elements with Heap' }, { type: 'prep', text: 'Video: Offer Negotiation Breakdown' }] },
+          { week: 12, items: [{ type: 'ai', text: 'Video: Fine-Tuning LLM with LoRA' }, { type: 'dsa', text: 'Short: Bit Manipulation Hacks' }, { type: 'sys', text: 'Short: Database Sharding vs Partitioning' }] }
+        ];
+
+        calGrid.innerHTML = schedule.map(w => `
+          <div class="cal-card">
+            <div class="cal-week">
+              <span>WEEK ${w.week}</span>
+              <span>3 UPLOADS</span>
+            </div>
+            ${w.items.map(item => `
+              <div class="cal-item">
+                <span class="cal-dot ${item.type}"></span>
+                <span>${item.text}</span>
+              </div>
+            `).join('')}
+          </div>
+        `).join('');
+      }
+    </script>
+  </body>
+</html>

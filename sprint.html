@@ -1,0 +1,687 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0b0e21">
+    <title>7-Day Interview & Video Sprint — Aayush Engineering Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=JetBrains+Mono:wght@400;600&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        --bg-deep: #090c1d;
+        --bg-card: #121633;
+        --bg-hover: #191f47;
+        --teal: #36e1d2;
+        --teal-glow: rgba(54, 225, 210, 0.25);
+        --purple: #7c68ff;
+        --purple-glow: rgba(124, 104, 255, 0.3);
+        --lavender: #c7b9ff;
+        --amber: #fca311;
+        --line: rgba(255, 255, 255, 0.08);
+        --line-active: rgba(54, 225, 210, 0.4);
+        --text: #f0f1fa;
+        --text-muted: #959bb8;
+        font-family: 'DM Sans', sans-serif;
+      }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        background: radial-gradient(circle at 15% 10%, #1a1e45 0%, var(--bg-deep) 50%),
+                    radial-gradient(circle at 85% 85%, #241a4a 0%, var(--bg-deep) 55%);
+        background-color: var(--bg-deep);
+        color: var(--text);
+        min-height: 100vh;
+        line-height: 1.5;
+        padding-bottom: 70px;
+      }
+      .nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 5%;
+        border-bottom: 1px solid var(--line);
+        background: rgba(9, 12, 29, 0.85);
+        backdrop-filter: blur(12px);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none;
+        color: var(--text);
+      }
+      .brand-badge {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, var(--teal), var(--purple));
+        display: grid;
+        place-items: center;
+        font-family: 'Manrope', sans-serif;
+        font-weight: 800;
+        font-size: 17px;
+        color: #070914;
+      }
+      .brand-title {
+        font-family: 'Manrope', sans-serif;
+        font-size: 16px;
+        font-weight: 800;
+      }
+      .brand-sub {
+        font-size: 11px;
+        color: var(--text-muted);
+        display: block;
+      }
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .nav-link {
+        font-size: 13px;
+        color: var(--text-muted);
+        text-decoration: none;
+        padding: 6px 12px;
+        border-radius: 8px;
+        transition: 0.15s;
+      }
+      .nav-link:hover {
+        color: var(--text);
+        background: rgba(255, 255, 255, 0.05);
+      }
+      .nav-btn {
+        background: linear-gradient(135deg, var(--teal), #21b5a5);
+        color: #060914;
+        font-weight: 700;
+        padding: 7px 16px;
+        border-radius: 8px;
+        font-size: 13px;
+        text-decoration: none;
+      }
+      .container {
+        max-width: 1050px;
+        margin: 0 auto;
+        padding: 36px 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 28px;
+      }
+      .hero {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .hero-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--teal);
+      }
+      .hero-tag .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--teal);
+        box-shadow: 0 0 10px var(--teal);
+      }
+      .hero h1 {
+        font-family: 'Manrope', sans-serif;
+        font-size: clamp(28px, 4vw, 42px);
+        font-weight: 800;
+        letter-spacing: -1px;
+      }
+      .hero h1 span {
+        background: linear-gradient(90deg, var(--teal), var(--lavender));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .hero p {
+        color: var(--text-muted);
+        font-size: 15px;
+        max-width: 680px;
+      }
+
+      /* Progress Bar Card */
+      .progress-card {
+        background: var(--bg-card);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .progress-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 13px;
+      }
+      .progress-stat {
+        font-family: 'Manrope', sans-serif;
+        font-weight: 700;
+        color: var(--teal);
+      }
+      .progress-track {
+        width: 100%;
+        height: 10px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 10px;
+        overflow: hidden;
+      }
+      .progress-fill {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, var(--teal), var(--purple));
+        transition: width 0.3s ease;
+      }
+
+      /* Days List */
+      .sprint-list {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+      .day-card {
+        background: var(--bg-card);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        transition: border-color 0.2s, background 0.2s;
+        position: relative;
+      }
+      .day-card.completed {
+        border-color: rgba(54, 225, 210, 0.4);
+        background: linear-gradient(135deg, rgba(18, 22, 51, 0.95), rgba(15, 34, 52, 0.5));
+      }
+      .day-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      .day-pill {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .day-num {
+        font-family: 'Manrope', sans-serif;
+        font-weight: 800;
+        font-size: 13px;
+        background: rgba(124, 104, 255, 0.2);
+        color: var(--lavender);
+        padding: 4px 10px;
+        border-radius: 8px;
+        letter-spacing: 0.5px;
+      }
+      .day-category {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--teal);
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+      }
+      .day-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .check-btn {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--line);
+        color: var(--text-muted);
+        padding: 6px 14px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.15s ease;
+      }
+      .check-btn:hover {
+        background: rgba(54, 225, 210, 0.15);
+        color: var(--teal);
+        border-color: var(--teal);
+      }
+      .check-btn.active {
+        background: var(--teal);
+        color: #080a17;
+        font-weight: 700;
+        border-color: var(--teal);
+      }
+
+      .day-body h3 {
+        font-family: 'Manrope', sans-serif;
+        font-size: 20px;
+        font-weight: 800;
+        color: #ffffff;
+        margin-bottom: 6px;
+      }
+      .day-desc {
+        font-size: 14px;
+        color: var(--text-muted);
+        margin-bottom: 14px;
+      }
+
+      .video-script-box {
+        background: rgba(0, 0, 0, 0.25);
+        border-left: 3px solid var(--teal);
+        border-radius: 0 10px 10px 0;
+        padding: 14px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .script-label {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        color: var(--teal);
+        font-weight: 700;
+      }
+      .script-text {
+        font-size: 13px;
+        font-style: italic;
+        color: var(--lavender);
+      }
+
+      .code-toggle-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 10px;
+      }
+      .lang-tabs {
+        display: flex;
+        gap: 6px;
+      }
+      .lang-tab {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        font-size: 12px;
+        font-weight: 600;
+        padding: 4px 10px;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+      .lang-tab.active {
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--text);
+      }
+      .copy-btn {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        font-size: 12px;
+        cursor: pointer;
+        padding: 4px 8px;
+      }
+      .copy-btn:hover { color: var(--teal); }
+
+      pre {
+        background: #070914;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 14px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12px;
+        color: #d1d5db;
+        overflow-x: auto;
+      }
+      code { font-family: inherit; }
+
+      .footer {
+        text-align: center;
+        padding: 30px;
+        font-size: 12px;
+        color: var(--text-muted);
+      }
+    </style>
+  </head>
+  <body>
+    <header class="nav">
+      <a class="brand" href="/dashboard">
+        <div class="brand-badge">AG</div>
+        <div>
+          <span class="brand-title">Aayush Engineering Hub</span>
+          <span class="brand-sub">@AayushGupta04</span>
+        </div>
+      </a>
+      <div class="nav-links">
+        <a class="nav-link" href="/dashboard">Growth Dashboard</a>
+        <a class="nav-link" href="/">Video Studio</a>
+        <a class="nav-btn" href="https://www.youtube.com/@AayushGupta04" target="_blank" rel="noopener">Open Channel ↗</a>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="hero">
+        <div class="hero-tag">
+          <span class="dot"></span>
+          Interactive Demo Sprint
+        </div>
+        <h1>1-Week Creator & Coding Sprint: <span>7-Day Blueprint</span></h1>
+        <p>A focused, practical 7-day demonstration crafted specifically for your channel. Each day pairs one high-yield interview question with an instant 45-second YouTube Short script and code solution.</p>
+      </section>
+
+      <!-- Progress Card -->
+      <section class="progress-card">
+        <div class="progress-meta">
+          <span>Sprint Completion Status</span>
+          <span class="progress-stat" id="progressText">0 / 7 Days Complete (0%)</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="progressBar"></div>
+        </div>
+      </section>
+
+      <!-- Day by Day List -->
+      <section class="sprint-list" id="sprintList">
+
+        <!-- Day 1 -->
+        <article class="day-card" data-day="1">
+          <div class="day-header">
+            <div class="day-pill">
+              <span class="day-num">DAY 1</span>
+              <span class="day-category">DSA · TWO POINTERS</span>
+            </div>
+            <div class="day-actions">
+              <button class="check-btn" onclick="toggleDay(1)">Mark Complete ✓</button>
+            </div>
+          </div>
+          <div class="day-body">
+            <h3>Two Sum on Sorted Arrays — Avoid Quadratic O(n²)</h3>
+            <p class="day-desc">Learn how to eliminate nested loops by leveraging sorted invariants with left and right inward pointers.</p>
+            <div class="video-script-box">
+              <span class="script-label">Ready Short Voiceover (40s)</span>
+              <p class="script-text">"Need to solve Two Sum in an interview without checking every pair? If your array is sorted, place pointer L at index zero and R at the end. Sum too small? Increment L. Sum too big? Decrement R. In linear O(n) time with zero extra space, you've solved it!"</p>
+            </div>
+            <div class="code-toggle-bar">
+              <span style="font-size:12px;color:var(--text-muted);">Optimal Implementation</span>
+              <button class="copy-btn" onclick="copyCode('code1')">Copy Code 📋</button>
+            </div>
+            <pre><code id="code1">// Java Optimal O(n) Time, O(1) Space
+public int[] twoSumSorted(int[] numbers, int target) {
+    int left = 0, right = numbers.length - 1;
+    while (left &lt; right) {
+        int sum = numbers[left] + numbers[right];
+        if (sum == target) return new int[]{left + 1, right + 1};
+        else if (sum &lt; target) left++;
+        else right--;
+    }
+    return new int[]{-1, -1};
+}</code></pre>
+          </div>
+        </article>
+
+        <!-- Day 2 -->
+        <article class="day-card" data-day="2">
+          <div class="day-header">
+            <div class="day-pill">
+              <span class="day-num">DAY 2</span>
+              <span class="day-category">DSA · SLIDING WINDOW</span>
+            </div>
+            <div class="day-actions">
+              <button class="check-btn" onclick="toggleDay(2)">Mark Complete ✓</button>
+            </div>
+          </div>
+          <div class="day-body">
+            <h3>Sliding Window Maximum — The Monotonic Deque</h3>
+            <p class="day-desc">Maintain only useful candidates in strictly decreasing order so each window's maximum is retrieved in O(1) amortized time.</p>
+            <div class="video-script-box">
+              <span class="script-label">Ready Short Voiceover (45s)</span>
+              <p class="script-text">"LeetCode 239 is notoriously tricky until you use a Monotonic Deque. As the window slides right, pop elements smaller than the incoming number from the back, and evict stale indices from the front. The head of the deque is always your maximum!"</p>
+            </div>
+            <div class="code-toggle-bar">
+              <span style="font-size:12px;color:var(--text-muted);">Optimal Implementation</span>
+              <button class="copy-btn" onclick="copyCode('code2')">Copy Code 📋</button>
+            </div>
+            <pre><code id="code2"># Python 3: Monotonic Deque O(n)
+from collections import deque
+def maxSlidingWindow(nums, k):
+    q, res = deque(), []
+    for i, n in enumerate(nums):
+        while q and nums[q[-1]] &lt; n:
+            q.pop()
+        q.append(i)
+        if q[0] == i - k:
+            q.popleft()
+        if i &gt;= k - 1:
+            res.append(nums[q[0]])
+    return res</code></pre>
+          </div>
+        </article>
+
+        <!-- Day 3 -->
+        <article class="day-card" data-day="3">
+          <div class="day-header">
+            <div class="day-pill">
+              <span class="day-num">DAY 3</span>
+              <span class="day-category">DSA · LINKED LISTS</span>
+            </div>
+            <div class="day-actions">
+              <button class="check-btn" onclick="toggleDay(3)">Mark Complete ✓</button>
+            </div>
+          </div>
+          <div class="day-body">
+            <h3>Floyd's Cycle Finding — Fast & Slow Pointers</h3>
+            <p class="day-desc">Detect loops in linked data structures without allocating a HashSet, preserving constant O(1) memory.</p>
+            <div class="video-script-box">
+              <span class="script-label">Ready Short Voiceover (35s)</span>
+              <p class="script-text">"Imagine two runners on a circular track: one runs twice as fast. Will they collide? Absolutely! The tortoise moves 1 step, the hare moves 2. If slow equals fast, you have a cycle. If fast hits null, there's an exit. Clean, elegant, zero extra space."</p>
+            </div>
+            <div class="code-toggle-bar">
+              <span style="font-size:12px;color:var(--text-muted);">Optimal Implementation</span>
+              <button class="copy-btn" onclick="copyCode('code3')">Copy Code 📋</button>
+            </div>
+            <pre><code id="code3">// Java Cycle Detection
+public boolean hasCycle(ListNode head) {
+    ListNode slow = head, fast = head;
+    while (fast != null && fast.next != null) {
+        slow = slow.next;
+        fast = fast.next.next;
+        if (slow == fast) return true;
+    }
+    return false;
+}</code></pre>
+          </div>
+        </article>
+
+        <!-- Day 4 -->
+        <article class="day-card" data-day="4">
+          <div class="day-header">
+            <div class="day-pill">
+              <span class="day-num">DAY 4</span>
+              <span class="day-category">DSA · BINARY SEARCH</span>
+            </div>
+            <div class="day-actions">
+              <button class="check-btn" onclick="toggleDay(4)">Mark Complete ✓</button>
+            </div>
+          </div>
+          <div class="day-body">
+            <h3>Binary Search on the Answer Space (Koko Eating Bananas)</h3>
+            <p class="day-desc">Transform optimization problems into monotonic boolean feasibility tests across a known numeric range.</p>
+            <div class="video-script-box">
+              <span class="script-label">Ready Short Voiceover (45s)</span>
+              <p class="script-text">"Binary Search isn't just for sorted arrays. When you see 'find the minimum speed or capacity to finish in H hours', binary search the speed itself! If speed S works, can we go slower? If not, speed up. Turn an O(N) linear sweep into blazing O(log K)!"</p>
+            </div>
+            <div class="code-toggle-bar">
+              <span style="font-size:12px;color:var(--text-muted);">Optimal Implementation</span>
+              <button class="copy-btn" onclick="copyCode('code4')">Copy Code 📋</button>
+            </div>
+            <pre><code id="code4"># Python Binary Search on Answer
+def minEatingSpeed(piles, h):
+    l, r = 1, max(piles)
+    res = r
+    while l &lt;= r:
+        k = (l + r) // 2
+        hours = sum((p + k - 1) // k for p in piles)
+        if hours &lt;= h:
+            res = k
+            r = k - 1
+        else:
+            l = k + 1
+    return res</code></pre>
+          </div>
+        </article>
+
+        <!-- Day 5 -->
+        <article class="day-card" data-day="5">
+          <div class="day-header">
+            <div class="day-pill">
+              <span class="day-num">DAY 5</span>
+              <span class="day-category">SYSTEM DESIGN</span>
+            </div>
+            <div class="day-actions">
+              <button class="check-btn" onclick="toggleDay(5)">Mark Complete ✓</button>
+            </div>
+          </div>
+          <div class="day-body">
+            <h3>Design a Scalable URL Shortener (TinyURL)</h3>
+            <p class="day-desc">Architecture breakdown: Base62 encoding, distributed ID generation (Snowflake), and Redis caching strategy for high-read throughput.</p>
+            <div class="video-script-box">
+              <span class="script-label">Ready Short Voiceover (45s)</span>
+              <p class="script-text">"How does TinyURL pack billions of links into 7 characters? 62 alphanumeric characters to the power of 7 gives 3.5 trillion unique URLs! Pair a distributed counter with Base62 encoding and a Redis read-through cache, and you have a 100k RPS system."</p>
+            </div>
+            <div class="code-toggle-bar">
+              <span style="font-size:12px;color:var(--text-muted);">Base62 Python Snippet</span>
+              <button class="copy-btn" onclick="copyCode('code5')">Copy Code 📋</button>
+            </div>
+            <pre><code id="code5">CHARS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+def encode_base62(num: int) -&gt; str:
+    if num == 0: return CHARS[0]
+    res = []
+    while num &gt; 0:
+        res.append(CHARS[num % 62])
+        num //= 62
+    return "".join(reversed(res))</code></pre>
+          </div>
+        </article>
+
+        <!-- Day 6 -->
+        <article class="day-card" data-day="6">
+          <div class="day-header">
+            <div class="day-pill">
+              <span class="day-num">DAY 6</span>
+              <span class="day-category">AI / LLM INTERNALS</span>
+            </div>
+            <div class="day-actions">
+              <button class="check-btn" onclick="toggleDay(6)">Mark Complete ✓</button>
+            </div>
+          </div>
+          <div class="day-body">
+            <h3>How Self-Attention Works: Visualizing Query, Key & Value</h3>
+            <p class="day-desc">Break down the core mathematical intuition powering modern LLMs without unnecessary academic jargon.</p>
+            <div class="video-script-box">
+              <span class="script-label">Ready Short Voiceover (45s)</span>
+              <p class="script-text">"Think of Attention like YouTube search: your Query is what you typed. The Keys are video titles in the database. The dot product compares your Query with all Keys to find relevant matches, and Softmax turns them into weights applied to the actual Value content."</p>
+            </div>
+            <div class="code-toggle-bar">
+              <span style="font-size:12px;color:var(--text-muted);">Scaled Dot-Product Formula</span>
+              <button class="copy-btn" onclick="copyCode('code6')">Copy Code 📋</button>
+            </div>
+            <pre><code id="code6"># PyTorch: Scaled Dot-Product Attention
+import torch
+import torch.nn.functional as F
+
+def attention(Q, K, V):
+    d_k = Q.size(-1)
+    scores = torch.matmul(Q, K.transpose(-2, -1)) / (d_k ** 0.5)
+    weights = F.softmax(scores, dim=-1)
+    return torch.matmul(weights, V), weights</code></pre>
+          </div>
+        </article>
+
+        <!-- Day 7 -->
+        <article class="day-card" data-day="7">
+          <div class="day-header">
+            <div class="day-pill">
+              <span class="day-num">DAY 7</span>
+              <span class="day-category">INTERVIEW STRATEGY</span>
+            </div>
+            <div class="day-actions">
+              <button class="check-btn" onclick="toggleDay(7)">Mark Complete ✓</button>
+            </div>
+          </div>
+          <div class="day-body">
+            <h3>Behavioral & Mock Interview: The STAR+Impact Method</h3>
+            <p class="day-desc">Convert technical stories into high-signal interview answers that prove engineering ownership and leadership.</p>
+            <div class="video-script-box">
+              <span class="script-label">Ready Short Voiceover (45s)</span>
+              <p class="script-text">"When interviewers ask 'Tell me about a time you solved a hard bug', avoid vague stories. Use STAR: Situation, Task, Action, Result. Highlight the specific technical trade-off you evaluated and end with measurable impact: 'reduced p99 latency by 35% across 2M users'."</p>
+            </div>
+            <div class="code-toggle-bar">
+              <span style="font-size:12px;color:var(--text-muted);">STAR Response Framework</span>
+              <button class="copy-btn" onclick="copyCode('code7')">Copy Framework 📋</button>
+            </div>
+            <pre><code id="code7">[S] Situation: Payment service timeouts during peak Diwali sale (500 errors spiked to 4%).
+[T] Task: Identify root cause under SLA deadline and prevent transaction drop-off.
+[A] Action: Profiled DB query logs, identified missing composite index on (user_id, status), added Redis idempotency key.
+[R] Result: Latency dropped from 2.4s to 85ms, zero dropped checkouts, authored post-mortem.</code></pre>
+          </div>
+        </article>
+
+      </section>
+
+      <footer class="footer">
+        Aayush Engineering Hub Demo Sprint · Completely Visual Web Application
+      </footer>
+    </main>
+
+    <script>
+      const completedDays = new Set(JSON.parse(localStorage.getItem('aayush_sprint_done') || '[]'));
+
+      function updateUI() {
+        document.querySelectorAll('.day-card').forEach(card => {
+          const day = Number(card.dataset.day);
+          const btn = card.querySelector('.check-btn');
+          if (completedDays.has(day)) {
+            card.classList.add('completed');
+            btn.classList.add('active');
+            btn.textContent = 'Completed ✓';
+          } else {
+            card.classList.remove('completed');
+            btn.classList.remove('active');
+            btn.textContent = 'Mark Complete ✓';
+          }
+        });
+        const count = completedDays.size;
+        const pct = Math.round((count / 7) * 100);
+        document.getElementById('progressText').textContent = `${count} / 7 Days Complete (${pct}%)`;
+        document.getElementById('progressBar').style.width = `${pct}%`;
+        localStorage.setItem('aayush_sprint_done', JSON.stringify([...completedDays]));
+      }
+
+      function toggleDay(day) {
+        if (completedDays.has(day)) completedDays.delete(day);
+        else completedDays.add(day);
+        updateUI();
+      }
+
+      function copyCode(id) {
+        const text = document.getElementById(id).textContent;
+        navigator.clipboard.writeText(text).then(() => {
+          alert('Copied to clipboard!');
+        });
+      }
+
+      updateUI();
+    </script>
+  </body>
+</html>
